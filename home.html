@@ -1,155 +1,176 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Aion Career Launch</title>
-  <link rel="stylesheet" href="styles.css" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Explore career opportunities across India's growing industries with Aion Career.">
+  <title>Aion Career — Build the career you deserve</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+  <script defer src="script.js"></script>
 </head>
 <body>
-  <header class="site-header">
-    <div class="brand">
-      <span class="brand-mark">∞</span>
-      <div>
-        <p class="brand-name">Aion Career</p>
-        <p class="brand-tag">Your opportunity launchpad</p>
-      </div>
-    </div>
-    <div class="header-actions">
-      <nav class="main-nav">
-        <a href="home.html" class="active">Home</a>
-        <a href="eligibility.html">Eligibility</a>
-        <a href="eligibility.html">Salary</a>
-        <a href="process.html">Process</a>
-        <a href="#faqs">FAQs</a>
+  <header class="site-header" data-header>
+    <a class="brand" href="home.html" aria-label="Aion Career home">
+      <img class="brand-logo" src="assets/aion-logo.png" alt="Aion Career">
+      <span>
+        <strong class="brand-name">Aion Career</strong>
+        <small class="brand-tag">Opportunity, thoughtfully matched</small>
+      </span>
+    </a>
+    <button class="menu-toggle" type="button" aria-label="Open navigation" aria-expanded="false" aria-controls="primary-nav">
+      <span></span><span></span>
+    </button>
+    <div class="header-actions" id="primary-nav">
+      <nav class="main-nav" aria-label="Primary navigation">
+        <a class="active" href="home.html">Home</a>
+        <a href="#eligibility">Eligibility</a>
+        <a href="#industries">Industries</a>
+        <a href="#process">Process</a>
         <a href="#contact">Contact</a>
       </nav>
-      <a href="eligibility.html" class="button button-primary header-cta">Apply Now</a>
+      <a href="eligibility.html" class="button button-primary header-cta">Apply now <span aria-hidden="true">→</span></a>
     </div>
   </header>
 
-  <main class="page-shell">
-    <section class="hero-panel">
-      <div class="hero-copy">
-        <p class="eyebrow">Recruitment Announcement 2026</p>
-        <h1>Build your career with Aion Career</h1>
-        <p>Explore career opportunities across Banking, IT, Manufacturing, Healthcare, Pharmaceuticals, KPO/BPO and Consulting.</p>
-        <div class="hero-actions">
-          <a href="eligibility.html" class="button button-primary">Apply Now</a>
-          <a href="eligibility.html" class="button button-secondary">Check Eligibility</a>
-        </div>
-      </div>
-
-    <div class="page-nav">
-      <a href="eligibility.html" class="button button-secondary">Next: Eligibility</a>
-    </div>
-          <strong>₹1.8 - ₹26 LPA</strong>
-        </div>
-        <div class="hero-visual-cards">
-          <div class="hero-visual-card">
-            <strong>Categories</strong>
-            <span>5</span>
+  <main>
+    <section class="hero section">
+      <div class="container hero-grid">
+        <div class="hero-copy">
+          <p class="badge"><span></span> Recruitment announcement 2026</p>
+          <h1>Build the career <span class="gradient-text">you deserve.</span></h1>
+          <p class="hero-lead">Explore opportunities across technology, banking, manufacturing, healthcare and other growing industries.</p>
+          <div class="hero-actions">
+            <a href="eligibility.html" class="button button-primary">Apply now <span aria-hidden="true">→</span></a>
+            <a href="#eligibility" class="button button-secondary">Check eligibility</a>
           </div>
-          <div class="hero-visual-card">
-            <strong>Industries</strong>
-            <span>7+</span>
+          <div class="trust-row" aria-label="Recruitment highlights">
+            <div><strong>7+</strong><span>Industries</span></div>
+            <div><strong>₹26 LPA</strong><span>Salary potential</span></div>
+            <div><strong>5</strong><span>Career pathways</span></div>
           </div>
         </div>
-        <div class="hero-visual-note">Simple online application with focused qualification paths.</div>
+
+        <div class="dashboard-wrap" aria-label="Candidate application dashboard preview">
+          <div class="dashboard">
+            <div class="dashboard-head">
+              <div>
+                <span class="overline">Candidate workspace</span>
+                <h2>Your application</h2>
+              </div>
+              <span class="status-dot">Active</span>
+            </div>
+            <div class="profile-card">
+              <div class="avatar">AS</div>
+              <div><strong>Candidate profile</strong><span>Skilled graduate pathway</span></div>
+              <span class="profile-score">84%</span>
+            </div>
+            <div class="progress-card">
+              <div class="card-row"><span>Application progress</span><strong>3 of 5</strong></div>
+              <div class="progress-track"><i></i></div>
+              <div class="progress-labels"><span>Profile</span><span>Verification</span><span>Interview</span></div>
+            </div>
+            <div class="dashboard-grid">
+              <div class="mini-card"><span>Available roles</span><strong>128</strong><small>+18 this week</small></div>
+              <div class="mini-card"><span>Salary range</span><strong>₹5–20L</strong><small>Based on profile</small></div>
+            </div>
+            <div class="eligibility-status"><span class="check">✓</span><div><strong>Profile eligible</strong><span>Technology, Banking & Consulting</span></div><a href="#eligibility" aria-label="View eligibility">→</a></div>
+          </div>
+          <span class="floating-tag tag-one">Technology</span>
+          <span class="floating-tag tag-two">Healthcare</span>
+          <span class="floating-tag tag-three">Banking</span>
+        </div>
       </div>
     </section>
 
-    <div class="badge-strip">
-      <span class="badge-pill">Multiple Job Categories</span>
-      <span class="badge-pill">Salary up to ₹26 LPA</span>
-      <span class="badge-pill">Simple Online Application</span>
-    </div>
-
-    <section class="eligibility-section">
-      <div class="section-header">
-        <p class="eyebrow">Eligibility & Salary Offered</p>
-        <h2>Choose the category that matches your qualification.</h2>
-      </div>
-      <div class="eligibility-grid">
-        <article class="info-card card-gradient-gold">
-          <span class="card-type">Category 1</span>
-          <h3>Graduates</h3>
-          <p>BA, BCom, BSc and related qualifications</p>
-          <strong>₹1.8 - ₹8 LPA</strong>
-        </article>
-        <article class="info-card card-gradient-orange">
-          <span class="card-type">Category 2</span>
-          <h3>Skilled Graduates</h3>
-          <p>BTech, BBA, BCA, BDS and related qualifications</p>
-          <strong>₹5 - ₹20 LPA</strong>
-        </article>
-        <article class="info-card card-gradient-pink">
-          <span class="card-type">Category 3</span>
-          <h3>Postgraduates</h3>
-          <p>MA, MCom, MSc and related qualifications</p>
-          <strong>₹3 - ₹12 LPA</strong>
-        </article>
-        <article class="info-card card-gradient-violet">
-          <span class="card-type">Category 4</span>
-          <h3>Skilled Postgraduates</h3>
-          <p>MBA, MCA, M.Sc (DS) and related qualifications</p>
-          <strong>₹5 - ₹26 LPA</strong>
-        </article>
-        <article class="info-card card-gradient-red">
-          <span class="card-type">Category 5</span>
-          <h3>Other Qualifications</h3>
-          <p>Qualifications not mentioned above</p>
-          <strong>₹1.5 - ₹7 LPA</strong>
-        </article>
+    <section class="stats-section reveal" aria-label="Aion Career statistics">
+      <div class="container stats-strip">
+        <div><strong data-count="128" data-suffix="+">0</strong><span>Active opportunities</span></div>
+        <div><strong data-count="7" data-suffix="+">0</strong><span>Industries covered</span></div>
+        <div><strong data-count="4200" data-suffix="+">0</strong><span>Applications processed</span></div>
+        <div><strong data-count="860" data-suffix="+">0</strong><span>Successful candidates</span></div>
       </div>
     </section>
 
-    <section class="industry-strip">
-      <div class="industry-pill">Banking / NBFC</div>
-      <div class="industry-pill">IT / ITes</div>
-      <div class="industry-pill">Manufacturing</div>
-      <div class="industry-pill">Healthcare</div>
-      <div class="industry-pill">Pharmaceuticals</div>
-      <div class="industry-pill">KPO / BPO</div>
-      <div class="industry-pill">Consulting</div>
-    </section>
-
-    <section class="process-section">
-      <div class="section-header">
-        <p class="eyebrow">Our Application Process</p>
-        <h2>Apply in just four simple steps.</h2>
-      </div>
-      <div class="process-grid">
-        <article class="step-card">
-          <div class="step-marker">1</div>
-          <h3>Check Eligibility</h3>
-          <p>Choose the category that matches your qualification.</p>
-        </article>
-        <article class="step-card">
-          <div class="step-marker">2</div>
-          <h3>Complete Application</h3>
-          <p>Fill in your personal, education and contact information.</p>
-        </article>
-        <article class="step-card">
-          <div class="step-marker">3</div>
-          <h3>Review & Accept</h3>
-          <p>Review your details and accept the declaration to proceed.</p>
-        </article>
-        <article class="step-card">
-          <div class="step-marker">4</div>
-          <h3>Pay Application Fee</h3>
-          <p>Pay ₹500 to complete your application and secure submission.</p>
-        </article>
+    <section class="section reveal" id="eligibility">
+      <div class="container">
+        <div class="section-heading">
+          <p class="eyebrow">Eligibility & salary</p>
+          <h2>Find opportunities that <span class="gradient-text">match your profile</span></h2>
+          <p>Choose your preferences to focus on the most relevant career pathway.</p>
+        </div>
+        <form class="filter-panel" aria-label="Opportunity filters">
+          <label>Education level<select name="education"><option>All qualifications</option><option>Graduate</option><option>Skilled graduate</option><option>Postgraduate</option><option>Skilled postgraduate</option></select></label>
+          <label>Experience<select name="experience"><option>Any experience</option><option>Fresher</option><option>1–3 years</option><option>3+ years</option></select></label>
+          <label>Preferred industry<select name="industry"><option>All industries</option><option>Technology</option><option>Banking</option><option>Healthcare</option><option>Manufacturing</option></select></label>
+          <label>Preferred location<select name="location"><option>All India</option><option>Bengaluru</option><option>Hyderabad</option><option>Mumbai</option><option>Remote</option></select></label>
+        </form>
+        <div class="eligibility-cards">
+          <article class="eligibility-card reveal-card"><span class="card-icon">G</span><small>Category 1</small><h3>Graduates</h3><p>BA, BCom, BSc and related qualifications</p><dl><div><dt>Experience</dt><dd>Fresher friendly</dd></div><div><dt>Salary</dt><dd>₹1.8–8 LPA</dd></div></dl><a href="eligibility.html">Explore opportunities <span>→</span></a></article>
+          <article class="eligibility-card reveal-card"><span class="card-icon">SG</span><small>Category 2</small><h3>Skilled graduates</h3><p>BTech, BBA, BCA, BDS and related qualifications</p><dl><div><dt>Experience</dt><dd>0–3 years</dd></div><div><dt>Salary</dt><dd>₹5–20 LPA</dd></div></dl><a href="eligibility.html">Explore opportunities <span>→</span></a></article>
+          <article class="eligibility-card reveal-card"><span class="card-icon">PG</span><small>Category 3</small><h3>Postgraduates</h3><p>MA, MCom, MSc and related qualifications</p><dl><div><dt>Experience</dt><dd>0–3 years</dd></div><div><dt>Salary</dt><dd>₹3–12 LPA</dd></div></dl><a href="eligibility.html">Explore opportunities <span>→</span></a></article>
+          <article class="eligibility-card reveal-card"><span class="card-icon">SP</span><small>Category 4</small><h3>Skilled postgraduates</h3><p>MBA, MCA, M.Sc (DS) and related qualifications</p><dl><div><dt>Experience</dt><dd>0–5 years</dd></div><div><dt>Salary</dt><dd>₹5–26 LPA</dd></div></dl><a href="eligibility.html">Explore opportunities <span>→</span></a></article>
+          <article class="eligibility-card reveal-card"><span class="card-icon">O</span><small>Category 5</small><h3>Other qualifications</h3><p>Qualifications and diplomas not mentioned above</p><dl><div><dt>Experience</dt><dd>Role dependent</dd></div><div><dt>Salary</dt><dd>₹1.5–7 LPA</dd></div></dl><a href="eligibility.html">Explore opportunities <span>→</span></a></article>
+        </div>
       </div>
     </section>
 
-    <div class="page-nav">
-      <a href="eligibility.html" class="button button-secondary">Next: Eligibility</a>
-    </div>
+    <section class="section section-alt reveal" id="industries">
+      <div class="container">
+        <div class="section-heading">
+          <p class="eyebrow">Industries we hire for</p>
+          <h2>Opportunity across <span class="gradient-text">growing sectors</span></h2>
+          <p>Explore roles in the industries shaping India’s next chapter of growth.</p>
+        </div>
+        <div class="bento-grid">
+          <article class="industry-card industry-feature"><span class="industry-icon">⌘</span><div><small>42 open positions</small><h3>Technology</h3><p>Build products, systems and digital experiences across software, data, testing and operations.</p><a href="industries.html">Explore roles <span>→</span></a></div></article>
+          <article class="industry-card"><span class="industry-icon">₹</span><div><small>24 open positions</small><h3>Banking</h3><p>Branch, lending and financial operations.</p><a href="industries.html">Explore roles <span>→</span></a></div></article>
+          <article class="industry-card"><span class="industry-icon">＋</span><div><small>18 open positions</small><h3>Healthcare</h3><p>Care, clinical support and administration.</p><a href="industries.html">Explore roles <span>→</span></a></div></article>
+          <article class="industry-card"><span class="industry-icon">◇</span><div><small>16 open positions</small><h3>Manufacturing</h3><p>Quality, production, logistics and operations.</p><a href="industries.html">Explore roles <span>→</span></a></div></article>
+          <article class="industry-card industry-wide"><span class="industry-icon">◎</span><div><small>28 open positions</small><h3>Customer Support</h3><p>Customer success, KPO and BPO services.</p><a href="industries.html">Explore roles <span>→</span></a></div></article>
+          <article class="industry-card"><span class="industry-icon">↗</span><div><small>21 open positions</small><h3>Sales & Marketing</h3><p>Growth, consulting and client-facing roles.</p><a href="industries.html">Explore roles <span>→</span></a></div></article>
+        </div>
+      </div>
+    </section>
+
+    <section class="section reveal" id="process">
+      <div class="container">
+        <div class="section-heading centered">
+          <p class="eyebrow">Application process</p>
+          <h2>A clear path from profile to <span class="gradient-text">opportunity</span></h2>
+          <p>Five transparent steps. No guesswork.</p>
+        </div>
+        <div class="timeline" data-timeline>
+          <div class="timeline-progress"></div>
+          <article><span>01</span><i>✓</i><h3>Check eligibility</h3><p>Choose the category that matches your education and skills.</p></article>
+          <article><span>02</span><i>✎</i><h3>Complete application</h3><p>Add your personal, education and contact information.</p></article>
+          <article><span>03</span><i>▣</i><h3>Document verification</h3><p>Submit your resume, ID proof and education certificate.</p></article>
+          <article><span>04</span><i>◉</i><h3>Interview & selection</h3><p>Meet the hiring team and demonstrate your fit.</p></article>
+          <article><span>05</span><i>→</i><h3>Receive final update</h3><p>Get your final status and next-step guidance.</p></article>
+        </div>
+        <p class="process-note">A ₹500 application fee completes your submission after eligibility and review.</p>
+      </div>
+    </section>
+
+    <section class="section cta-section reveal">
+      <div class="container cta-panel">
+        <div><p class="eyebrow">Your next chapter</p><h2>Ready to take the <span class="gradient-text">next step?</span></h2><p>Find an opportunity that matches your skills, experience and ambitions.</p></div>
+        <div class="cta-actions"><a href="#industries" class="button button-secondary">Explore opportunities</a><a href="eligibility.html" class="button button-primary">Start application <span>→</span></a></div>
+      </div>
+    </section>
   </main>
 
-  <footer class="page-footer">
-    <p>Designed with your progress in mind. Start with eligibility, then complete the application process.</p>
+  <footer class="site-footer" id="contact">
+    <div class="container footer-grid">
+      <div class="footer-brand"><a class="brand" href="home.html"><img class="brand-logo brand-logo-footer" src="assets/aion-logo.png" alt="Aion Career"><strong>Aion Career</strong></a><p>A trusted career launchpad connecting talent with meaningful opportunities across India’s growing industries.</p><div class="socials"><a href="#" aria-label="LinkedIn">in</a><a href="#" aria-label="Instagram">ig</a><a href="#" aria-label="X">x</a></div></div>
+      <div><h3>Quick links</h3><a href="home.html">Home</a><a href="#eligibility">Eligibility</a><a href="#process">Application process</a></div>
+      <div><h3>Industries</h3><a href="industries.html">Technology</a><a href="industries.html">Banking</a><a href="industries.html">Healthcare</a><a href="industries.html">Manufacturing</a></div>
+      <div><h3>Candidate resources</h3><a href="eligibility.html">Salary guide</a><a href="process.html">Documents required</a><a href="process.html">Interview process</a></div>
+      <div><h3>Contact</h3><p>India</p><a href="mailto:careers@aioncareer.in">careers@aioncareer.in</a><p>Mon–Sat, 9:00–18:00</p></div>
+    </div>
+    <div class="container footer-bottom"><span>© 2026 Aion Career. All rights reserved.</span><div><a href="#">Privacy policy</a><a href="#">Terms & conditions</a></div></div>
   </footer>
 </body>
 </html>
