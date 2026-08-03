@@ -36,11 +36,41 @@ document.addEventListener("DOMContentLoaded", () => {
       brandSplash.remove();
       document.body.classList.remove("splash-active");
     } else {
-      window.setTimeout(() => brandSplash.classList.add("is-exiting"), 4850);
+      const dockSplashIntoHeader = () => {
+        const splashLogo = brandSplash.querySelector(".brand-splash-logo");
+        const splashWords = brandSplash.querySelector(".brand-splash-words");
+        const headerLogo = document.querySelector(".site-header .brand-logo");
+        const headerTag = document.querySelector(".site-header .brand-tag");
+
+        brandSplash.classList.add("is-docking");
+
+        const animateInto = (source, target) => {
+          if (!source || !target) return;
+          const from = source.getBoundingClientRect();
+          const to = target.getBoundingClientRect();
+          source.animate([
+            { transform: "translate(0, 0) scale(1)", opacity: 1 },
+            {
+              transform: `translate(${to.left - from.left}px, ${to.top - from.top}px) scale(${to.width / from.width}, ${to.height / from.height})`,
+              opacity: 1
+            }
+          ], {
+            duration: 950,
+            easing: "cubic-bezier(.16, 1, .3, 1)",
+            fill: "forwards"
+          });
+        };
+
+        animateInto(splashLogo, headerLogo);
+        animateInto(splashWords, headerTag);
+        window.setTimeout(() => brandSplash.classList.add("is-exiting"), 900);
+      };
+
+      window.setTimeout(dockSplashIntoHeader, 4850);
       window.setTimeout(() => {
         brandSplash.remove();
         document.body.classList.remove("splash-active");
-      }, 5600);
+      }, 6500);
     }
   }
   const createLetterNodes = (text) => Array.from(text, (letter, index) => {
