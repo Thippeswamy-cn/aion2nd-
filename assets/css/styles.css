@@ -591,8 +591,6 @@ body.modal-open { overflow: hidden; }
 
 @media (max-width: 560px) {
   body { font-size: 16px; }
-  body.splash-active { overflow: auto; }
-  .brand-splash { display: none; }
   .container, .page-shell, .page-footer { width: calc(100% - 32px); }
   .section { padding: 68px 0; }
   .site-header { padding-inline: 16px; }
@@ -600,10 +598,13 @@ body.modal-open { overflow: hidden; }
   .brand-name { font-size: 16px; }
   .brand-tag { display: block; font-size: 10px; line-height: 1.25; }
   .brand-splash { padding: 20px; }
+  .brand-splash.is-static { transition: none; }
   .brand-splash-content { width: min(100%, 350px); gap: 12px; }
-  .brand-splash-logo { width: 88px; background: transparent; }
+  .brand-splash-logo { width: 88px; background: transparent; animation: none; opacity: 1; transform: none; filter: drop-shadow(0 16px 32px rgba(168,85,247,.24)); }
+  .brand-splash-glow { animation: none; opacity: .55; transform: scale(1.05); }
   .brand-splash-name { margin-bottom: 5px; font-size: 24px; }
   .brand-splash-words { max-width: 240px; font-size: 15px; line-height: 1.3; }
+  .brand-splash-words span { animation: none; opacity: 1; transform: none; filter: none; }
   .hero { padding: 30px 0 58px; }
   .hero h1 { font-size: clamp(42px,13vw,54px); }
   .hero-actions, .cta-actions { display: grid; width: 100%; }

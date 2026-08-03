@@ -33,9 +33,15 @@ document.addEventListener("DOMContentLoaded", () => {
   const mobileViewport = window.matchMedia("(max-width: 560px)").matches;
   const brandSplash = document.querySelector("[data-brand-splash]");
   if (brandSplash) {
-    if (reduceMotion || mobileViewport) {
+    if (reduceMotion) {
       brandSplash.remove();
       document.body.classList.remove("splash-active");
+    } else if (mobileViewport) {
+      brandSplash.classList.add("is-static");
+      window.setTimeout(() => {
+        brandSplash.remove();
+        document.body.classList.remove("splash-active");
+      }, 3000);
     } else {
       const dockSplashIntoHeader = () => {
         const splashContent = brandSplash.querySelector(".brand-splash-content");
