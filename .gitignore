@@ -1,3 +1,9 @@
 .server.stdout.log
 .server.stderr.log
+*.current.log
+data/
+__pycache__/
+*.pyc
+.layout-check.png
+.chrome-test/
 readme.local-backup.txt
