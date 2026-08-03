@@ -591,18 +591,17 @@ body.modal-open { overflow: hidden; }
 
 @media (max-width: 560px) {
   body { font-size: 16px; }
-  body.splash-active { overflow: auto; }
-  .brand-splash { display: none; }
   .container, .page-shell, .page-footer { width: calc(100% - 32px); }
   .section { padding: 68px 0; }
   .site-header { padding-inline: 16px; }
   .brand-logo { width: 60px; height: 50px; }
   .brand-name { font-size: 16px; }
   .brand-tag { display: block; font-size: 10px; line-height: 1.25; }
-  .brand-splash-content { gap: 16px; }
-  .brand-splash-logo { width: 96px; }
-  .brand-splash-name { margin-bottom: 5px; font-size: 25px; }
-  .brand-splash-words { max-width: 250px; font-size: 16px; }
+  .brand-splash { padding: 20px; }
+  .brand-splash-content { width: min(100%, 350px); gap: 12px; }
+  .brand-splash-logo { width: 88px; background: transparent; }
+  .brand-splash-name { margin-bottom: 5px; font-size: 24px; }
+  .brand-splash-words { max-width: 240px; font-size: 15px; line-height: 1.3; }
   .hero { padding: 30px 0 58px; }
   .hero h1 { font-size: clamp(42px,13vw,54px); }
   .hero-actions, .cta-actions { display: grid; width: 100%; }
