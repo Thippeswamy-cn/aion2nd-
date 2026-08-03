@@ -315,10 +315,6 @@ input::placeholder, textarea::placeholder { color: var(--text-muted); opacity: .
 .section-heading h2, .cta-panel h2 { margin: 0; font-size: clamp(38px, 4vw, 46px); line-height: 1.15; letter-spacing: -.045em; text-wrap: balance; }
 .section-heading > p:last-child, .cta-panel p { max-width: 610px; margin: 16px 0 0; color: var(--text-secondary); }
 
-.filter-panel { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 24px; padding: 16px; border: 1px solid var(--border); border-radius: 16px; background: var(--background-secondary); }
-.filter-panel label { color: var(--text-muted); font-size: 11px; font-weight: 700; }
-.filter-panel select { width: 100%; min-height: 46px; margin-top: 6px; padding: 0 36px 0 12px; color: var(--text-primary); background: var(--card); border: 1px solid var(--border); border-radius: 9px; outline: 0; }
-.filter-panel select:focus { border-color: var(--primary); }
 .eligibility-cards { display: grid; grid-template-columns: repeat(6, 1fr); gap: 16px; }
 .eligibility-card {
   grid-column: span 2;
@@ -560,7 +556,6 @@ body.modal-open { overflow: hidden; }
   .dashboard-wrap { width: min(100%, 520px); margin: auto; }
   .tag-one { right: -8px; }
   .tag-two { left: -8px; }
-  .filter-panel { grid-template-columns: 1fr 1fr; }
   .stats-strip { grid-template-columns: 1fr 1fr; }
   .stats-strip > div:nth-child(3) { border-left: 0; border-top: 1px solid var(--border); }
   .stats-strip > div:nth-child(4) { border-top: 1px solid var(--border); }
@@ -593,7 +588,7 @@ body.modal-open { overflow: hidden; }
   .dashboard { padding: 14px; }
   .floating-tag { display: none; }
   .section-heading h2, .cta-panel h2 { font-size: 36px; }
-  .filter-panel, .eligibility-cards, .bento-grid, .jobs-grid, .form-grid { grid-template-columns: 1fr; }
+  .eligibility-cards, .bento-grid, .jobs-grid, .form-grid { grid-template-columns: 1fr; }
   .jobs-heading { align-items: flex-start; flex-direction: column; }
   .job-card { min-height: 285px; }
   .application-modal { padding: 10px; }
