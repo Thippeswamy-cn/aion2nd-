@@ -1,24 +1,16 @@
 # AION
 
-Static website for Aion Career.
+Single-page landing website for Aion Career.
 
 ## Project structure
 
 ```text
-.
-├── index.html
-├── eligibility.html
-├── industries.html
-├── process.html
-└── assets/
-    ├── css/
-    │   └── styles.css
-    ├── images/
-    │   └── aion-logo.png
-    ├── js/
-    │   └── script.js
-    └── videos/
-        └── splash-video.mp4
+index.html
+assets/
+  css/styles.css
+  images/
+  js/script.js
+  videos/splash-video.mp4
 ```
 
 ## Run locally
@@ -29,5 +21,5 @@ Python 3.10 or newer is required. Start the website and application API together
 python server.py
 ```
 
-Open `http://127.0.0.1:8000`. Job applications are stored in
+Open `http://127.0.0.1:8000`. Enquiries and job applications are stored in
 `data/applications.db`, with uploaded resumes under `data/resumes/`.

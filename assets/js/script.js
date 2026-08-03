@@ -1,6 +1,83 @@
 document.addEventListener("DOMContentLoaded", () => {
   const page = window.location.pathname.split("/").pop() || "index.html";
 
+  const root = document.documentElement;
+  const themeButtons = document.querySelectorAll("[data-theme-toggle]");
+  const systemTheme = window.matchMedia("(prefers-color-scheme: light)");
+  let savedTheme = null;
+  try { savedTheme = window.localStorage.getItem("aion-theme"); } catch (_) {}
+
+  const applyTheme = (theme) => {
+    root.dataset.theme = theme;
+    const nextTheme = theme === "dark" ? "light" : "dark";
+    themeButtons.forEach((button) => {
+      button.setAttribute("aria-label", `Switch to ${nextTheme} mode`);
+      button.setAttribute("title", `Switch to ${nextTheme} mode`);
+      button.setAttribute("aria-pressed", String(theme === "light"));
+    });
+  };
+
+  applyTheme(savedTheme || (systemTheme.matches ? "light" : "dark"));
+  themeButtons.forEach((button) => button.addEventListener("click", () => {
+    const theme = root.dataset.theme === "light" ? "dark" : "light";
+    applyTheme(theme);
+    savedTheme = theme;
+    try { window.localStorage.setItem("aion-theme", theme); } catch (_) {}
+  }));
+  systemTheme.addEventListener?.("change", (event) => {
+    if (!savedTheme) applyTheme(event.matches ? "light" : "dark");
+  });
+
+  const flippingWord = document.querySelector("[data-flipping-word]");
+  const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const createLetterNodes = (text) => Array.from(text, (letter, index) => {
+    const character = document.createElement("span");
+    character.className = "flip-letter";
+    character.style.setProperty("--letter-index", index);
+    character.textContent = letter === " " ? "\u00a0" : letter;
+    return character;
+  });
+
+  if (flippingWord && !reduceMotion) {
+    const words = ["deserve.", "envision.", "choose."];
+    let wordIndex = 0;
+    const renderWord = (word) => {
+      flippingWord.replaceChildren(...createLetterNodes(word));
+    };
+
+    renderWord(words[wordIndex]);
+    window.setInterval(() => {
+      flippingWord.classList.add("is-exiting");
+      window.setTimeout(() => {
+        wordIndex = (wordIndex + 1) % words.length;
+        renderWord(words[wordIndex]);
+        flippingWord.classList.remove("is-exiting");
+        flippingWord.classList.add("is-entering");
+        window.setTimeout(() => {
+          flippingWord.classList.remove("is-entering");
+        }, 580);
+      }, 480);
+    }, 1500);
+  }
+
+  const staticFlipText = document.querySelectorAll("[data-letter-flip-static]");
+  staticFlipText.forEach((element) => {
+    const text = element.textContent;
+    if (reduceMotion) return;
+    element.setAttribute("aria-label", text);
+    element.replaceChildren(...createLetterNodes(text));
+  });
+  if (!reduceMotion && staticFlipText.length) {
+    const flipObserver = new IntersectionObserver((entries, observer) => {
+      entries.forEach((entry) => {
+        if (!entry.isIntersecting) return;
+        entry.target.classList.add("is-visible");
+        observer.unobserve(entry.target);
+      });
+    }, { threshold: 0.45 });
+    staticFlipText.forEach((element) => flipObserver.observe(element));
+  }
+
   const header = document.querySelector("[data-header]");
   const menuButton = document.querySelector(".menu-toggle");
   const navigation = document.querySelector(".header-actions");
