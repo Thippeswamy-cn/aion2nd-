@@ -115,7 +115,7 @@ document.addEventListener("DOMContentLoaded", () => {
   menuButton?.addEventListener("click", () => {
     const open = menuButton.getAttribute("aria-expanded") !== "true";
     menuButton.setAttribute("aria-expanded", String(open));
-    menuButton.setAttribute("aria-label", open ? "Close navigation" : "Open navigation");
+    menuButton.setAttribute("aria-label", open ? "Close header controls" : "Open header controls");
     navigation?.classList.toggle("open", open);
     header?.classList.remove("header-hidden");
   });
@@ -123,7 +123,7 @@ document.addEventListener("DOMContentLoaded", () => {
   navigation?.querySelectorAll("a").forEach((link) => {
     link.addEventListener("click", () => {
       menuButton?.setAttribute("aria-expanded", "false");
-      menuButton?.setAttribute("aria-label", "Open navigation");
+      menuButton?.setAttribute("aria-label", "Open header controls");
       navigation.classList.remove("open");
     });
   });
