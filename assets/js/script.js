@@ -30,9 +30,10 @@ document.addEventListener("DOMContentLoaded", () => {
 
   const flippingWord = document.querySelector("[data-flipping-word]");
   const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const mobileViewport = window.matchMedia("(max-width: 560px)").matches;
   const brandSplash = document.querySelector("[data-brand-splash]");
   if (brandSplash) {
-    if (reduceMotion) {
+    if (reduceMotion || mobileViewport) {
       brandSplash.remove();
       document.body.classList.remove("splash-active");
     } else {

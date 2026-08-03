@@ -597,6 +597,8 @@ body.modal-open { overflow: hidden; }
 
 @media (max-width: 560px) {
   body { font-size: 16px; }
+  body.splash-active { overflow: auto; }
+  .brand-splash { display: none; }
   .container, .page-shell, .page-footer { width: calc(100% - 32px); }
   .section { padding: 68px 0; }
   .site-header { padding-inline: 16px; }
