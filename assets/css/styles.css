@@ -112,6 +112,7 @@ input::placeholder, textarea::placeholder { color: var(--text-muted); opacity: .
 .brand-tag { display: block; margin-top: 3px; color: var(--text-muted); font-size: 11px; }
 .header-actions { display: flex; align-items: center; }
 .header-actions { gap: 28px; }
+.main-nav { display: none !important; }
 .theme-toggle { width: 42px; height: 42px; flex: none; display: grid; place-items: center; padding: 0; border: 1px solid var(--border); border-radius: 12px; color: var(--text-primary); background: var(--card); cursor: pointer; transition: color 200ms ease, background 200ms ease, border-color 200ms ease, transform 200ms var(--ease); }
 .theme-toggle:hover { color: #a855f7; border-color: rgba(139,92,246,.5); transform: translateY(-2px); }
 .theme-icon { width: 19px; height: 19px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
