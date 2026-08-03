@@ -30,6 +30,19 @@ document.addEventListener("DOMContentLoaded", () => {
 
   const flippingWord = document.querySelector("[data-flipping-word]");
   const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const brandSplash = document.querySelector("[data-brand-splash]");
+  if (brandSplash) {
+    if (reduceMotion) {
+      brandSplash.remove();
+      document.body.classList.remove("splash-active");
+    } else {
+      window.setTimeout(() => brandSplash.classList.add("is-exiting"), 2850);
+      window.setTimeout(() => {
+        brandSplash.remove();
+        document.body.classList.remove("splash-active");
+      }, 3600);
+    }
+  }
   const createLetterNodes = (text) => Array.from(text, (letter, index) => {
     const character = document.createElement("span");
     character.className = "flip-letter";
