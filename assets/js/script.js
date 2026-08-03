@@ -36,11 +36,11 @@ document.addEventListener("DOMContentLoaded", () => {
       brandSplash.remove();
       document.body.classList.remove("splash-active");
     } else {
-      window.setTimeout(() => brandSplash.classList.add("is-exiting"), 2850);
+      window.setTimeout(() => brandSplash.classList.add("is-exiting"), 4850);
       window.setTimeout(() => {
         brandSplash.remove();
         document.body.classList.remove("splash-active");
-      }, 3600);
+      }, 5600);
     }
   }
   const createLetterNodes = (text) => Array.from(text, (letter, index) => {
