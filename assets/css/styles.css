@@ -198,7 +198,7 @@ input::placeholder, textarea::placeholder { color: var(--text-muted); opacity: .
   background: radial-gradient(circle, rgba(139,92,246,.13), transparent 68%);
   pointer-events: none;
 }
-.hero-grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(480px, 1fr); grid-template-areas: "badge badge" "title summary" "title actions" "enquiry dashboard" "trust trust"; align-items: start; column-gap: 56px; row-gap: 22px; }
+.hero-grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(480px, 1fr); grid-template-areas: "badge badge" "title summary" "title actions" "enquiry enquiry" "trust trust"; align-items: start; column-gap: 56px; row-gap: 22px; }
 .hero-copy { display: contents; }
 .hero-copy > .badge { grid-area: badge; }
 .hero-copy > h1 { grid-area: title; align-self: center; }
@@ -552,7 +552,7 @@ body.modal-open { overflow: hidden; }
   .main-nav a { padding-inline: 14px; }
   .header-cta { width: 100%; }
   .hero { min-height: auto; padding-top: 36px; }
-  .hero-grid { grid-template-columns: 1fr; grid-template-areas: "badge" "title" "summary" "actions" "enquiry" "dashboard" "trust"; gap: 28px; }
+  .hero-grid { grid-template-columns: 1fr; grid-template-areas: "badge" "title" "summary" "actions" "enquiry" "trust"; gap: 28px; }
   .hero-grid > .badge, .hero-grid > h1, .hero-grid > .hero-lead { text-align: center; }
   .badge { margin-inline: auto; }
   .hero-lead { margin-inline: auto; padding: 0; border-left: 0; }

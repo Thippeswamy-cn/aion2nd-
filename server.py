@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+import os
 import re
 import secrets
 import sqlite3
@@ -260,7 +261,10 @@ class ApplicationHandler(SimpleHTTPRequestHandler):
 
 if __name__ == "__main__":
     initialize_database()
-    server = ThreadingHTTPServer(("127.0.0.1", 8000), ApplicationHandler)
+    host = os.environ.get("HOST", "0.0.0.0")
+    port = int(os.environ.get("PORT", "8000"))
+    server = ThreadingHTTPServer((host, port), ApplicationHandler)
+    print(f"Aion Career is running at http://{host}:{port}", flush=True)
     try:
         server.serve_forever()
     except KeyboardInterrupt:

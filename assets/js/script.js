@@ -57,7 +57,7 @@ document.addEventListener("DOMContentLoaded", () => {
           flippingWord.classList.remove("is-entering");
         }, 580);
       }, 480);
-    }, 1500);
+    }, 2200);
   }
 
   const staticFlipText = document.querySelectorAll("[data-letter-flip-static]");

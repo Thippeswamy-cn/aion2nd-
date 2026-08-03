@@ -23,3 +23,9 @@ python server.py
 
 Open `http://127.0.0.1:8000`. Enquiries and job applications are stored in
 `data/applications.db`, with uploaded resumes under `data/resumes/`.
+
+## Deploy on Render
+
+Deploy the repository as a **Web Service** (not a Static Site). The included
+`render.yaml` starts `python server.py`, uses Render's assigned port, and checks
+`/api/health` after deployment.
