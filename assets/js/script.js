@@ -37,10 +37,8 @@ document.addEventListener("DOMContentLoaded", () => {
       document.body.classList.remove("splash-active");
     } else {
       const dockSplashIntoHeader = () => {
-        const splashLogo = brandSplash.querySelector(".brand-splash-logo");
-        const splashWords = brandSplash.querySelector(".brand-splash-words");
-        const headerLogo = document.querySelector(".site-header .brand-logo");
-        const headerTag = document.querySelector(".site-header .brand-tag");
+        const splashContent = brandSplash.querySelector(".brand-splash-content");
+        const headerBrand = document.querySelector(".site-header .brand");
 
         brandSplash.classList.add("is-docking");
 
@@ -48,7 +46,7 @@ document.addEventListener("DOMContentLoaded", () => {
           if (!source || !target) return;
           const from = source.getBoundingClientRect();
           const to = target.getBoundingClientRect();
-          source.animate([
+          const landingAnimation = source.animate([
             { transform: "translate(0, 0) scale(1)", opacity: 1 },
             {
               transform: `translate(${to.left - from.left}px, ${to.top - from.top}px) scale(${to.width / from.width}, ${to.height / from.height})`,
@@ -59,11 +57,13 @@ document.addEventListener("DOMContentLoaded", () => {
             easing: "cubic-bezier(.16, 1, .3, 1)",
             fill: "forwards"
           });
+          landingAnimation.addEventListener("finish", () => {
+            source.style.opacity = "0";
+          }, { once: true });
         };
 
-        animateInto(splashLogo, headerLogo);
-        animateInto(splashWords, headerTag);
-        window.setTimeout(() => brandSplash.classList.add("is-exiting"), 900);
+        animateInto(splashContent, headerBrand);
+        window.setTimeout(() => brandSplash.classList.add("is-exiting"), 1000);
       };
 
       window.setTimeout(dockSplashIntoHeader, 4850);
