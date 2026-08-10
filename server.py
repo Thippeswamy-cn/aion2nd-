@@ -44,9 +44,11 @@ load_local_environment(ROOT / ".env")
 
 DATA_DIR = ROOT / "data"
 UPLOAD_DIR = DATA_DIR / "resumes"
+PHOTO_DIR = DATA_DIR / "photos"
 DATABASE = DATA_DIR / "applications.db"
-MAX_REQUEST_SIZE = 6 * 1024 * 1024
+MAX_REQUEST_SIZE = 10 * 1024 * 1024
 MAX_RESUME_SIZE = 5 * 1024 * 1024
+MAX_PHOTO_SIZE = 3 * 1024 * 1024
 ALLOWED_RESUMES = {
     ".pdf": {"application/pdf", "application/octet-stream"},
     ".doc": {"application/msword", "application/octet-stream"},
@@ -55,6 +57,12 @@ ALLOWED_RESUMES = {
         "application/zip",
         "application/octet-stream",
     },
+}
+ALLOWED_PHOTOS = {
+    ".jpg": {"image/jpeg", "application/octet-stream"},
+    ".jpeg": {"image/jpeg", "application/octet-stream"},
+    ".png": {"image/png", "application/octet-stream"},
+    ".webp": {"image/webp", "application/octet-stream"},
 }
 ROLES_BY_QUALIFICATION = {
     "Graduate": {
@@ -95,12 +103,18 @@ def _email_header(value: str, limit: int = 120) -> str:
     return " ".join(value.splitlines())[:limit]
 
 
-def build_application_emails(application_id: str, fields: dict[str, str], resume):
+def requested_role(fields: dict[str, str]) -> str:
+    if fields.get("role") == "Other":
+        return fields.get("otherRole", "").strip()
+    return fields.get("role", "").strip()
+
+
+def build_application_emails(application_id: str, fields: dict[str, str], resume, photo):
     sender = os.environ["SMTP_FROM_EMAIL"].strip()
     admin_email = os.environ["ADMIN_EMAIL"].strip()
     candidate_email = fields["email"].strip()
     candidate_name = _email_header(fields["fullName"])
-    role = _email_header(fields["role"])
+    role = _email_header(requested_role(fields))
 
     admin_message = EmailMessage()
     admin_message["Subject"] = f"New application: {role} - {candidate_name}"
@@ -116,7 +130,7 @@ def build_application_emails(application_id: str, fields: dict[str, str], resume
         f"Location: {fields['location']}\n"
         f"Qualification: {fields['qualification']}\n"
         f"Experience: {fields['experience']}\n"
-        f"Role: {fields['role']}\n\n"
+        f"Role: {requested_role(fields)}\n\n"
         f"Candidate message:\n{fields.get('message', '').strip() or 'Not provided'}\n"
     )
     filename, content_type, content = resume
@@ -127,6 +141,14 @@ def build_application_emails(application_id: str, fields: dict[str, str], resume
         subtype=subtype,
         filename=Path(filename).name,
     )
+    photo_filename, photo_content_type, photo_content = photo
+    photo_maintype, photo_subtype = photo_content_type.split("/", 1)
+    admin_message.add_attachment(
+        photo_content,
+        maintype=photo_maintype,
+        subtype=photo_subtype,
+        filename=Path(photo_filename).name,
+    )
 
     candidate_message = EmailMessage()
     candidate_message["Subject"] = f"Application received - {application_id}"
@@ -136,7 +158,7 @@ def build_application_emails(application_id: str, fields: dict[str, str], resume
     candidate_message.set_content(
         f"Hello {fields['fullName']},\n\n"
         "Thank you for applying through AION Technology. We have received your application "
-        f"for {fields['role']}.\n\n"
+        f"for {requested_role(fields)}.\n\n"
         f"Application reference: {application_id}\n\n"
         "Our team will review your profile and contact you with the next steps.\n\n"
         "AION Technology\n"
@@ -144,7 +166,7 @@ def build_application_emails(application_id: str, fields: dict[str, str], resume
     return admin_message, candidate_message
 
 
-def send_application_emails(application_id: str, fields: dict[str, str], resume) -> None:
+def send_application_emails(application_id: str, fields: dict[str, str], resume, photo) -> None:
     if not email_notifications_configured():
         raise RuntimeError("SMTP email notifications are not configured.")
     try:
@@ -157,7 +179,7 @@ def send_application_emails(application_id: str, fields: dict[str, str], resume)
     password = os.environ["SMTP_PASSWORD"]
     use_tls = os.environ.get("SMTP_USE_TLS", "true").strip().lower() in {"1", "true", "yes", "on"}
     context = ssl.create_default_context()
-    messages = build_application_emails(application_id, fields, resume)
+    messages = build_application_emails(application_id, fields, resume, photo)
 
     if port == 465:
         client = smtplib.SMTP_SSL(host, port, timeout=20, context=context)
@@ -175,6 +197,7 @@ def send_application_emails(application_id: str, fields: dict[str, str], resume)
 
 def initialize_database() -> None:
     UPLOAD_DIR.mkdir(parents=True, exist_ok=True)
+    PHOTO_DIR.mkdir(parents=True, exist_ok=True)
     with sqlite3.connect(DATABASE) as connection:
         connection.execute("PRAGMA journal_mode=WAL")
         connection.execute(
@@ -191,6 +214,8 @@ def initialize_database() -> None:
                 message TEXT NOT NULL DEFAULT '',
                 resume_path TEXT NOT NULL,
                 resume_original_name TEXT NOT NULL,
+                photo_path TEXT NOT NULL DEFAULT '',
+                photo_original_name TEXT NOT NULL DEFAULT '',
                 submitted_at TEXT NOT NULL,
                 status TEXT NOT NULL DEFAULT 'new',
                 UNIQUE(email, role)
@@ -212,6 +237,17 @@ def initialize_database() -> None:
             )
             """
         )
+        application_columns = {
+            row[1] for row in connection.execute("PRAGMA table_info(applications)")
+        }
+        if "photo_path" not in application_columns:
+            connection.execute(
+                "ALTER TABLE applications ADD COLUMN photo_path TEXT NOT NULL DEFAULT ''"
+            )
+        if "photo_original_name" not in application_columns:
+            connection.execute(
+                "ALTER TABLE applications ADD COLUMN photo_original_name TEXT NOT NULL DEFAULT ''"
+            )
         enquiry_columns = {
             row[1] for row in connection.execute("PRAGMA table_info(enquiries)")
         }
@@ -361,15 +397,18 @@ class ApplicationHandler(SimpleHTTPRequestHandler):
         )
         fields: dict[str, str] = {}
         resume = None
+        photo = None
         for part in message.iter_parts():
             name = part.get_param("name", header="content-disposition")
             filename = part.get_filename()
             if name == "resume" and filename:
                 resume = (Path(filename).name, part.get_content_type(), part.get_payload(decode=True) or b"")
+            elif name == "photo" and filename:
+                photo = (Path(filename).name, part.get_content_type(), part.get_payload(decode=True) or b"")
             elif name:
                 fields[name] = (part.get_content() or "").strip()
 
-        error = self.validate(fields, resume)
+        error = self.validate(fields, resume, photo)
         if error:
             self.send_json(HTTPStatus.BAD_REQUEST, {"error": error})
             return
@@ -378,24 +417,32 @@ class ApplicationHandler(SimpleHTTPRequestHandler):
         original_name, _, resume_bytes = resume
         extension = Path(original_name).suffix.lower()
         resume_path = UPLOAD_DIR / f"{application_id}{extension}"
+        photo_original_name, _, photo_bytes = photo
+        photo_extension = Path(photo_original_name).suffix.lower()
+        photo_path = PHOTO_DIR / f"{application_id}{photo_extension}"
         resume_path.write_bytes(resume_bytes)
+        photo_path.write_bytes(photo_bytes)
+        role = requested_role(fields)
         try:
             with sqlite3.connect(DATABASE) as connection:
                 connection.execute(
                     """INSERT INTO applications
                     (id, role, full_name, email, phone, location, qualification,
-                     experience, message, resume_path, resume_original_name, submitted_at)
-                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)""",
+                     experience, message, resume_path, resume_original_name, photo_path,
+                     photo_original_name, submitted_at)
+                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)""",
                     (
-                        application_id, fields["role"], fields["fullName"],
+                        application_id, role, fields["fullName"],
                         fields["email"].lower(), fields["phone"], fields["location"],
                         fields["qualification"], fields["experience"], fields.get("message", ""),
                         str(resume_path.relative_to(ROOT)), original_name,
+                        str(photo_path.relative_to(ROOT)), photo_original_name,
                         datetime.now(timezone.utc).isoformat(),
                     ),
                 )
         except sqlite3.IntegrityError:
             resume_path.unlink(missing_ok=True)
+            photo_path.unlink(missing_ok=True)
             self.send_json(
                 HTTPStatus.CONFLICT,
                 {"error": "An application for this role already exists for that email address."},
@@ -404,7 +451,7 @@ class ApplicationHandler(SimpleHTTPRequestHandler):
 
         email_notification_sent = False
         try:
-            send_application_emails(application_id, fields, resume)
+            send_application_emails(application_id, fields, resume, photo)
             email_notification_sent = True
         except Exception as exc:
             print(
@@ -422,7 +469,7 @@ class ApplicationHandler(SimpleHTTPRequestHandler):
         )
 
     @staticmethod
-    def validate(fields, resume) -> str | None:
+    def validate(fields, resume, photo) -> str | None:
         required = ("role", "fullName", "email", "phone", "location", "qualification", "experience")
         if any(not fields.get(name) for name in required):
             return "Please complete all required fields."
@@ -434,6 +481,10 @@ class ApplicationHandler(SimpleHTTPRequestHandler):
             return "Please select a valid open role."
         if fields["role"] not in ROLES_BY_QUALIFICATION[fields["qualification"]]:
             return "Please select a role related to your qualification."
+        if fields["role"] == "Other" and not fields.get("otherRole", "").strip():
+            return "Please enter the role you are looking for."
+        if len(fields.get("otherRole", "")) > 100:
+            return "The requested role must be 100 characters or fewer."
         if len(fields["fullName"]) > 100 or len(fields["location"]) > 100 or len(fields.get("message", "")) > 2000:
             return "One or more fields are too long."
         if not re.fullmatch(r"[^\s@]+@[^\s@]+\.[^\s@]+", fields["email"]):
@@ -448,6 +499,14 @@ class ApplicationHandler(SimpleHTTPRequestHandler):
             return "Résumé must be a PDF, DOC or DOCX file."
         if not content or len(content) > MAX_RESUME_SIZE:
             return "Résumé must be smaller than 5 MB."
+        if not photo:
+            return "Please attach your photo."
+        photo_filename, photo_content_type, photo_content = photo
+        photo_extension = Path(photo_filename).suffix.lower()
+        if photo_extension not in ALLOWED_PHOTOS or photo_content_type not in ALLOWED_PHOTOS[photo_extension]:
+            return "Photo must be a JPG, PNG or WebP file."
+        if not photo_content or len(photo_content) > MAX_PHOTO_SIZE:
+            return "Photo must be smaller than 3 MB."
         return None
 
     def send_json(self, status: HTTPStatus, payload: dict) -> None:

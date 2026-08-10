@@ -16,10 +16,11 @@ class ApplicationRoleValidationTests(unittest.TestCase):
             "consent": "on",
         }
         self.resume = ("resume.pdf", "application/pdf", b"%PDF-1.4 test")
+        self.photo = ("photo.jpg", "image/jpeg", b"JPEG test")
 
     def validate(self, qualification, role):
         fields = {**self.fields, "qualification": qualification, "role": role}
-        return ApplicationHandler.validate(fields, self.resume)
+        return ApplicationHandler.validate(fields, self.resume, self.photo)
 
     def test_general_graduate_accepts_related_business_role(self):
         self.assertIsNone(self.validate("Graduate", "Branch Operations Executive"))
@@ -36,7 +37,19 @@ class ApplicationRoleValidationTests(unittest.TestCase):
     def test_other_role_is_available_for_every_qualification(self):
         for qualification in ROLES_BY_QUALIFICATION:
             with self.subTest(qualification=qualification):
-                self.assertIsNone(self.validate(qualification, "Other"))
+                fields = {
+                    **self.fields,
+                    "qualification": qualification,
+                    "role": "Other",
+                    "otherRole": "Operations Coordinator",
+                }
+                self.assertIsNone(ApplicationHandler.validate(fields, self.resume, self.photo))
+
+    def test_other_role_requires_a_role_name(self):
+        self.assertEqual(
+            self.validate("Graduate", "Other"),
+            "Please enter the role you are looking for.",
+        )
 
 
 if __name__ == "__main__":

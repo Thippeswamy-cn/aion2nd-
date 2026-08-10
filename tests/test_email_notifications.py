@@ -27,6 +27,7 @@ class ApplicationEmailTests(unittest.TestCase):
             "message": "Ready to join.",
         }
         self.resume = ("resume.pdf", "application/pdf", b"%PDF-1.4 test")
+        self.photo = ("photo.jpg", "image/jpeg", b"JPEG test")
 
     def test_configuration_requires_every_setting(self):
         with patch.dict(os.environ, self.settings, clear=False):
@@ -38,7 +39,7 @@ class ApplicationEmailTests(unittest.TestCase):
     def test_sends_admin_notification_and_candidate_confirmation(self, smtp):
         client = smtp.return_value
         with patch.dict(os.environ, self.settings, clear=False):
-            send_application_emails("AION-TEST-001", self.fields, self.resume)
+            send_application_emails("AION-TEST-001", self.fields, self.resume, self.photo)
 
         smtp.assert_called_once_with("smtp.example.com", 587, timeout=20)
         client.starttls.assert_called_once()
@@ -49,7 +50,7 @@ class ApplicationEmailTests(unittest.TestCase):
         candidate_message = client.send_message.call_args_list[1].args[0]
         self.assertEqual(str(admin_message["To"]), "careers@example.com")
         self.assertEqual(str(admin_message["Reply-To"]), "candidate@example.com")
-        self.assertEqual(len(list(admin_message.iter_attachments())), 1)
+        self.assertEqual(len(list(admin_message.iter_attachments())), 2)
         self.assertEqual(str(candidate_message["To"]), "candidate@example.com")
         self.assertIn("AION-TEST-001", candidate_message.get_content())
 

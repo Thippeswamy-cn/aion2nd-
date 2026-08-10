@@ -61,6 +61,8 @@ document.addEventListener("DOMContentLoaded", () => {
   const applicationSuccess = document.querySelector("[data-application-success]");
   const roleInput = applicationForm?.querySelector("[data-role-input]");
   const qualificationInput = applicationForm?.querySelector('select[name="qualification"]');
+  const otherRoleField = applicationForm?.querySelector("[data-other-role-field]");
+  const otherRoleInput = applicationForm?.querySelector("[data-other-role-input]");
   const rolesByQualification = {
     "Graduate": ["Branch Operations Executive", "Customer Success Associate", "Business Development Associate", "Other"],
     "Skilled graduate": ["Software Engineer", "Data Analyst", "Healthcare Administration Associate", "Customer Success Associate", "Quality Assurance Executive", "Other"],
@@ -73,6 +75,17 @@ document.addEventListener("DOMContentLoaded", () => {
     roles: [...group.querySelectorAll("option")].map((option) => option.value)
   })) : [];
   let modalTrigger = null;
+
+  const syncOtherRoleField = (focus = false) => {
+    const show = roleInput?.value === "Other";
+    if (otherRoleField) otherRoleField.hidden = !show;
+    if (otherRoleInput) {
+      otherRoleInput.disabled = !show;
+      otherRoleInput.required = show;
+      if (!show) otherRoleInput.value = "";
+      if (show && focus) otherRoleInput.focus();
+    }
+  };
 
   const setRoleOptions = (qualification = "", preferredRole = "") => {
     if (!roleInput) return;
@@ -88,6 +101,7 @@ document.addEventListener("DOMContentLoaded", () => {
     });
     roleInput.value = preferredRole;
     if (roleInput.value !== preferredRole) roleInput.value = "";
+    syncOtherRoleField();
   };
 
   const openApplication = (trigger, role = "", qualification = "") => {
@@ -127,6 +141,7 @@ document.addEventListener("DOMContentLoaded", () => {
   qualificationInput?.addEventListener("change", () => {
     setRoleOptions(qualificationInput.value, roleInput?.value || "");
   });
+  roleInput?.addEventListener("change", () => syncOtherRoleField(true));
   document.querySelectorAll("[data-close-application]").forEach((trigger) => trigger.addEventListener("click", closeApplication));
 
   if (new URLSearchParams(window.location.search).get("apply") === "1") {
@@ -172,12 +187,19 @@ document.addEventListener("DOMContentLoaded", () => {
     const submit = applicationForm.querySelector('button[type="submit"]');
     const error = applicationForm.querySelector("[data-form-error]");
     const resume = applicationForm.elements.resume?.files?.[0];
+    const photo = applicationForm.elements.photo?.files?.[0];
     if (resume && resume.size > 5 * 1024 * 1024) {
       applicationForm.elements.resume.setCustomValidity("Please upload a file smaller than 5 MB.");
       applicationForm.reportValidity();
       return;
     }
     applicationForm.elements.resume?.setCustomValidity("");
+    if (photo && photo.size > 3 * 1024 * 1024) {
+      applicationForm.elements.photo.setCustomValidity("Please upload a photo smaller than 3 MB.");
+      applicationForm.reportValidity();
+      return;
+    }
+    applicationForm.elements.photo?.setCustomValidity("");
     error.hidden = true;
     submit.disabled = true;
     const original = submit.innerHTML;
@@ -192,6 +214,7 @@ document.addEventListener("DOMContentLoaded", () => {
       if (reference) reference.textContent = `Application reference: ${result.applicationId}`;
       applicationSuccess.querySelector("button")?.focus();
       applicationForm.reset();
+      syncOtherRoleField();
     } catch (requestError) {
       error.textContent = requestError.message;
       error.hidden = false;

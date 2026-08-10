@@ -12,7 +12,7 @@
   <link rel="preload" as="image" href="assets/images/aion-logo.webp">
   <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="assets/css/styles.css?v=29">
-  <script defer src="assets/js/script.js?v=25"></script>
+  <script defer src="assets/js/script.js?v=26"></script>
 </head>
 <body id="top">
   <a class="skip-link" href="#main">Skip to content</a>
@@ -218,16 +218,18 @@
     <div class="modal-backdrop" data-close-application></div>
     <section class="application-dialog" role="dialog" aria-modal="true" aria-labelledby="application-title">
       <button class="modal-close" type="button" aria-label="Close application form" data-close-application>×</button>
-      <div class="application-intro"><p class="kicker">Job application</p><h2 id="application-title">Take the next step.</h2><p>Choose your role, complete your details and upload your résumé. No payment is required now; a ₹500 fee applies only after eligibility and review.</p></div>
+      <div class="application-intro"><p class="kicker">Job application</p><h2 id="application-title">Take the next step.</h2><p>Choose your role, complete your details and upload your photo and résumé. No payment is required now; a ₹500 fee applies only after eligibility and review.</p></div>
       <form class="application-form" data-application-form>
         <div class="form-grid">
           <label>Role you are looking for<select name="role" data-role-input required><option value="">Select a role</option><optgroup label="Technology"><option>Software Engineer</option><option>Data Analyst</option></optgroup><optgroup label="Banking"><option>Branch Operations Executive</option></optgroup><optgroup label="Healthcare"><option>Healthcare Administration Associate</option></optgroup><optgroup label="Customer service"><option>Customer Success Associate</option></optgroup><optgroup label="Manufacturing"><option>Quality Assurance Executive</option></optgroup><optgroup label="Sales &amp; Marketing"><option>Business Development Associate</option></optgroup><optgroup label="Other"><option>Other</option></optgroup></select></label>
+          <label data-other-role-field hidden>Role you are looking for<input type="text" name="otherRole" data-other-role-input maxlength="100" placeholder="Enter the role name" disabled></label>
           <label>Highest qualification<select name="qualification" required><option value="">Select qualification</option><option>Graduate</option><option>Skilled graduate</option><option>Postgraduate</option><option>Skilled postgraduate</option><option>Diploma / Other</option></select></label>
           <label>Full name<input type="text" name="fullName" autocomplete="name" placeholder="Your full name" required></label>
           <label>Email address<input type="email" name="email" autocomplete="email" placeholder="you@example.com" required></label>
           <label>Phone number<input type="tel" name="phone" autocomplete="tel" placeholder="+91 80503 50011" pattern="[0-9+() -]{10,18}" required></label>
           <label>Current location<input type="text" name="location" autocomplete="address-level2" placeholder="City, State" required></label>
           <label>Experience<select name="experience" required><option value="">Select experience</option><option>Fresher</option><option>Less than 1 year</option><option>1–3 years</option><option>3–5 years</option><option>5+ years</option></select></label>
+          <label>Photo<input class="file-input" type="file" name="photo" accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp" required><small>JPG, PNG or WebP · Maximum 3 MB</small></label>
           <label>Résumé<input class="file-input" type="file" name="resume" accept=".pdf,.doc,.docx" required><small>PDF, DOC or DOCX · Maximum 5 MB</small></label>
         </div>
         <label>Why are you a good fit?<textarea name="message" rows="4" maxlength="2000" placeholder="Briefly tell us about your skills and experience"></textarea></label>
