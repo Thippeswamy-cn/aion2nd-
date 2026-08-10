@@ -32,19 +32,30 @@ ALLOWED_RESUMES = {
         "application/octet-stream",
     },
 }
-ROLES = {
-    "Software Engineer",
-    "Data Analyst",
-    "Branch Operations Executive",
-    "Healthcare Administration Associate",
-    "Customer Success Associate",
-    "Quality Assurance Executive",
-    "Business Development Associate",
+ROLES_BY_QUALIFICATION = {
+    "Graduate": {
+        "Branch Operations Executive", "Customer Success Associate",
+        "Business Development Associate", "Other",
+    },
+    "Skilled graduate": {
+        "Software Engineer", "Data Analyst", "Healthcare Administration Associate",
+        "Customer Success Associate", "Quality Assurance Executive", "Other",
+    },
+    "Postgraduate": {
+        "Data Analyst", "Branch Operations Executive", "Customer Success Associate",
+        "Business Development Associate", "Other",
+    },
+    "Skilled postgraduate": {
+        "Software Engineer", "Data Analyst", "Branch Operations Executive",
+        "Customer Success Associate", "Quality Assurance Executive",
+        "Business Development Associate", "Other",
+    },
+    "Diploma / Other": {
+        "Customer Success Associate", "Quality Assurance Executive", "Other",
+    },
 }
-QUALIFICATIONS = {
-    "Graduate", "Skilled graduate", "Postgraduate",
-    "Skilled postgraduate", "Diploma / Other",
-}
+QUALIFICATIONS = set(ROLES_BY_QUALIFICATION)
+ROLES = set().union(*ROLES_BY_QUALIFICATION.values())
 ENQUIRY_CATEGORIES = QUALIFICATIONS | {"Employer / recruiter", "Not sure"}
 EXPERIENCE_LEVELS = {
     "Fresher", "Less than 1 year", "1–3 years", "3–5 years", "5+ years",
@@ -286,10 +297,12 @@ class ApplicationHandler(SimpleHTTPRequestHandler):
             return "Please complete all required fields."
         if fields.get("consent") != "on":
             return "Consent is required to submit an application."
-        if fields["role"] not in ROLES:
-            return "Please select a valid open role."
         if fields["qualification"] not in QUALIFICATIONS or fields["experience"] not in EXPERIENCE_LEVELS:
             return "Please select valid qualification and experience values."
+        if fields["role"] not in ROLES:
+            return "Please select a valid open role."
+        if fields["role"] not in ROLES_BY_QUALIFICATION[fields["qualification"]]:
+            return "Please select a role related to your qualification."
         if len(fields["fullName"]) > 100 or len(fields["location"]) > 100 or len(fields.get("message", "")) > 2000:
             return "One or more fields are too long."
         if not re.fullmatch(r"[^\s@]+@[^\s@]+\.[^\s@]+", fields["email"]):
