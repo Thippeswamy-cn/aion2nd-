@@ -7,8 +7,11 @@ import os
 import posixpath
 import re
 import secrets
+import smtplib
 import sqlite3
+import ssl
 from datetime import datetime, timezone
+from email.message import EmailMessage
 from email.parser import BytesParser
 from email.policy import default
 from http import HTTPStatus
@@ -18,6 +21,27 @@ from urllib.parse import unquote, urlsplit
 
 
 ROOT = Path(__file__).resolve().parent
+
+
+def load_local_environment(path: Path) -> None:
+    """Load local development settings without overriding real environment variables."""
+    if not path.is_file():
+        return
+    for raw_line in path.read_text(encoding="utf-8").splitlines():
+        line = raw_line.strip()
+        if not line or line.startswith("#") or "=" not in line:
+            continue
+        key, value = line.split("=", 1)
+        key = key.strip()
+        value = value.strip()
+        if len(value) >= 2 and value[0] == value[-1] and value[0] in {'"', "'"}:
+            value = value[1:-1]
+        if key:
+            os.environ.setdefault(key, value)
+
+
+load_local_environment(ROOT / ".env")
+
 DATA_DIR = ROOT / "data"
 UPLOAD_DIR = DATA_DIR / "resumes"
 DATABASE = DATA_DIR / "applications.db"
@@ -60,6 +84,93 @@ ENQUIRY_CATEGORIES = QUALIFICATIONS | {"Employer / recruiter", "Not sure"}
 EXPERIENCE_LEVELS = {
     "Fresher", "Less than 1 year", "1–3 years", "3–5 years", "5+ years",
 }
+
+
+def email_notifications_configured() -> bool:
+    required = ("SMTP_HOST", "SMTP_PORT", "SMTP_USERNAME", "SMTP_PASSWORD", "SMTP_FROM_EMAIL", "ADMIN_EMAIL")
+    return all(os.environ.get(name, "").strip() for name in required)
+
+
+def _email_header(value: str, limit: int = 120) -> str:
+    return " ".join(value.splitlines())[:limit]
+
+
+def build_application_emails(application_id: str, fields: dict[str, str], resume):
+    sender = os.environ["SMTP_FROM_EMAIL"].strip()
+    admin_email = os.environ["ADMIN_EMAIL"].strip()
+    candidate_email = fields["email"].strip()
+    candidate_name = _email_header(fields["fullName"])
+    role = _email_header(fields["role"])
+
+    admin_message = EmailMessage()
+    admin_message["Subject"] = f"New application: {role} - {candidate_name}"
+    admin_message["From"] = sender
+    admin_message["To"] = admin_email
+    admin_message["Reply-To"] = candidate_email
+    admin_message.set_content(
+        "A new application was submitted.\n\n"
+        f"Application ID: {application_id}\n"
+        f"Name: {fields['fullName']}\n"
+        f"Email: {candidate_email}\n"
+        f"Phone: {fields['phone']}\n"
+        f"Location: {fields['location']}\n"
+        f"Qualification: {fields['qualification']}\n"
+        f"Experience: {fields['experience']}\n"
+        f"Role: {fields['role']}\n\n"
+        f"Candidate message:\n{fields.get('message', '').strip() or 'Not provided'}\n"
+    )
+    filename, content_type, content = resume
+    maintype, subtype = content_type.split("/", 1)
+    admin_message.add_attachment(
+        content,
+        maintype=maintype,
+        subtype=subtype,
+        filename=Path(filename).name,
+    )
+
+    candidate_message = EmailMessage()
+    candidate_message["Subject"] = f"Application received - {application_id}"
+    candidate_message["From"] = sender
+    candidate_message["To"] = candidate_email
+    candidate_message["Reply-To"] = admin_email
+    candidate_message.set_content(
+        f"Hello {fields['fullName']},\n\n"
+        "Thank you for applying through AION Technology. We have received your application "
+        f"for {fields['role']}.\n\n"
+        f"Application reference: {application_id}\n\n"
+        "Our team will review your profile and contact you with the next steps.\n\n"
+        "AION Technology\n"
+    )
+    return admin_message, candidate_message
+
+
+def send_application_emails(application_id: str, fields: dict[str, str], resume) -> None:
+    if not email_notifications_configured():
+        raise RuntimeError("SMTP email notifications are not configured.")
+    try:
+        port = int(os.environ["SMTP_PORT"])
+    except ValueError as exc:
+        raise RuntimeError("SMTP_PORT must be a number.") from exc
+
+    host = os.environ["SMTP_HOST"].strip()
+    username = os.environ["SMTP_USERNAME"].strip()
+    password = os.environ["SMTP_PASSWORD"]
+    use_tls = os.environ.get("SMTP_USE_TLS", "true").strip().lower() in {"1", "true", "yes", "on"}
+    context = ssl.create_default_context()
+    messages = build_application_emails(application_id, fields, resume)
+
+    if port == 465:
+        client = smtplib.SMTP_SSL(host, port, timeout=20, context=context)
+    else:
+        client = smtplib.SMTP(host, port, timeout=20)
+    with client:
+        client.ehlo()
+        if use_tls and port != 465:
+            client.starttls(context=context)
+            client.ehlo()
+        client.login(username, password)
+        for message in messages:
+            client.send_message(message)
 
 
 def initialize_database() -> None:
@@ -156,7 +267,13 @@ class ApplicationHandler(SimpleHTTPRequestHandler):
 
     def do_GET(self) -> None:
         if self._request_path() == "/api/health":
-            self.send_json(HTTPStatus.OK, {"status": "ok"})
+            self.send_json(
+                HTTPStatus.OK,
+                {
+                    "status": "ok",
+                    "emailNotifications": "configured" if email_notifications_configured() else "not_configured",
+                },
+            )
             return
         self._serve_public_file()
 
@@ -285,9 +402,23 @@ class ApplicationHandler(SimpleHTTPRequestHandler):
             )
             return
 
+        email_notification_sent = False
+        try:
+            send_application_emails(application_id, fields, resume)
+            email_notification_sent = True
+        except Exception as exc:
+            print(
+                f"Email notification failed for {application_id}: {type(exc).__name__}: {exc}",
+                flush=True,
+            )
+
         self.send_json(
             HTTPStatus.CREATED,
-            {"message": "Application received.", "applicationId": application_id},
+            {
+                "message": "Application received.",
+                "applicationId": application_id,
+                "emailNotificationSent": email_notification_sent,
+            },
         )
 
     @staticmethod
