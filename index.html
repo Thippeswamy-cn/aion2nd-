@@ -1,195 +1,242 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="Explore career opportunities across India's growing industries with Aion Career.">
-  <title>Aion Career — Build the career you deserve</title>
-  <script>try{const t=localStorage.getItem("aion-theme")||(matchMedia("(prefers-color-scheme: light)").matches?"light":"dark");document.documentElement.dataset.theme=t}catch(e){document.documentElement.dataset.theme="dark"}</script>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Explore career opportunities across India's growing industries with AION Tech Career.">
+  <meta name="theme-color" content="#070914">
+  <title>AION Tech Career — Your next opportunity starts here</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link rel="preload" as="image" href="assets/images/aion-logo.png">
+  <link rel="preload" as="image" href="assets/images/industries/technology.jpg" fetchpriority="high">
+  <link rel="preload" as="image" href="assets/images/aion-logo.webp">
   <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="assets/css/styles.css?v=24">
-  <script defer src="assets/js/script.js?v=23"></script>
+  <link rel="stylesheet" href="assets/css/styles.css?v=28">
+  <script defer src="assets/js/script.js?v=24"></script>
 </head>
-<body id="top" class="splash-active">
-  <div class="brand-splash" data-brand-splash aria-hidden="true">
-    <div class="brand-splash-content">
-      <span class="brand-splash-glow"></span>
-      <img class="brand-splash-logo" src="assets/images/aion-logo.png" alt="">
-      <span class="brand-splash-copy">
-        <strong class="brand-splash-name">Aion Career</strong>
-        <span class="brand-splash-words">
-          <span style="--word-index:0">The</span><span style="--word-index:1">future</span><span style="--word-index:2">belongs</span><span style="--word-index:3">to</span><span style="--word-index:4">those</span><span style="--word-index:5">who</span><span style="--word-index:6">believe</span><span style="--word-index:7">in</span><span style="--word-index:8">the</span><span style="--word-index:9">beauty</span><span style="--word-index:10">of</span><span style="--word-index:11">their</span><span style="--word-index:12">dreams</span>
-        </span>
-      </span>
-    </div>
-  </div>
+<body id="top">
+  <a class="skip-link" href="#main">Skip to content</a>
+
   <header class="site-header" data-header>
-    <a class="brand" href="#top" aria-label="Aion Career home">
-      <img class="brand-logo" src="assets/images/aion-logo.png" alt="Aion Career">
-      <span>
-        <strong class="brand-name">Aion Career</strong>
-        <small class="brand-tag">The future belongs to those who believe in the beauty of their dreams</small>
-      </span>
-    </a>
-    <button class="menu-toggle" type="button" aria-label="Open header controls" aria-expanded="false" aria-controls="header-controls">
-      <span></span><span></span>
-    </button>
-    <div class="header-actions" id="header-controls">
-      <button class="theme-toggle" type="button" data-theme-toggle aria-label="Switch to light mode" title="Switch to light mode"><svg class="theme-icon theme-icon-sun" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.42 1.42M17.65 17.65l1.42 1.42M2 12h2M20 12h2M4.93 19.07l1.42-1.42M17.65 6.35l1.42-1.42"/></svg><svg class="theme-icon theme-icon-moon" viewBox="0 0 24 24" aria-hidden="true"><path d="M20.5 14.2A8.5 8.5 0 0 1 9.8 3.5 8.5 8.5 0 1 0 20.5 14.2Z"/></svg></button>
-      <a href="?apply=1" class="button button-primary header-cta" data-open-application>Apply now <span aria-hidden="true">→</span></a>
+    <div class="nav-shell">
+      <a class="brand" href="#top" aria-label="AION Tech Career home">
+        <img src="assets/images/aion-logo.webp" alt="" width="78" height="43" decoding="async">
+        <span class="brand-copy"><strong>AION TECH</strong><em>CAREER</em></span>
+      </a>
+      <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="primary-nav" aria-label="Open navigation" data-menu-toggle><span></span><span></span></button>
+      <div class="nav-panel" id="primary-nav" data-nav-panel>
+        <nav class="main-nav" aria-label="Primary navigation">
+          <a href="#opportunities">Opportunities</a>
+          <a href="#eligibility">Eligibility</a>
+          <a href="#process">How it works</a>
+          <a href="#contact">Contact</a>
+        </nav>
+        <a class="button button-small button-bright" href="?apply=1" data-open-application>Apply now <span aria-hidden="true">↗</span></a>
+      </div>
     </div>
   </header>
 
-  <main>
-    <section class="hero section">
-      <div class="container hero-grid">
+  <main id="main">
+    <section class="hero" aria-labelledby="hero-title">
+      <div class="hero-media" aria-hidden="true"></div>
+      <div class="hero-gridlines" aria-hidden="true"></div>
+      <div class="container hero-layout">
         <div class="hero-copy">
-          <p class="badge"><span></span> Recruitment announcement 2026</p>
-          <h1 aria-label="Build the career you deserve."><span aria-hidden="true">Build the career you <span class="word-flipper gradient-text"><span data-flipping-word>deserve.</span></span></span></h1>
-          <p class="hero-lead">Explore opportunities across technology, banking, manufacturing, healthcare and other growing industries.</p>
+          <p class="kicker hero-kicker"><span></span> Recruitment opportunities · 2026</p>
+          <h1 id="hero-title">Your ambition deserves the <em><span>right</span> opportunity.</em></h1>
+          <p class="hero-lead">Connect your education, skills and experience with meaningful roles across India’s fastest-growing industries.</p>
           <div class="hero-actions">
-            <a href="?apply=1" class="button button-primary" data-open-application>Apply now <span aria-hidden="true">→</span></a>
-            <a href="#eligibility" class="button button-secondary">Check eligibility</a>
+            <a class="button button-bright" href="?apply=1" data-open-application>Start your application <span aria-hidden="true">↗</span></a>
+            <a class="button button-ghost" href="#eligibility">Check your eligibility</a>
           </div>
-          <div class="hero-enquiry" id="enquiry">
-            <div class="hero-enquiry-heading"><p class="eyebrow">Quick enquiry</p><h2>How can we help?</h2><p>Leave your details and our career team will contact you.</p></div>
-            <form class="enquiry-form hero-enquiry-form" data-enquiry-form>
-              <div class="form-grid">
-                <label>Full name <input type="text" name="fullName" autocomplete="name" maxlength="100" placeholder="Your full name" required></label>
-                <label>Email address <input type="email" name="email" autocomplete="email" placeholder="you@example.com" required></label>
-                <label>Phone number <input type="tel" name="phone" autocomplete="tel" pattern="[0-9+() -]{10,18}" placeholder="8050350011" required></label>
-                <label>Enquiry about <select name="enquiryType" required><option value="">Select a topic</option><option>Job opportunities</option><option>Eligibility</option><option>Application status</option><option>Employer enquiry</option><option>Other</option></select></label>
-              </div>
-              <label>Your message <textarea name="message" rows="3" maxlength="2000" placeholder="How can we help you?" required></textarea></label>
-              <p class="form-error" data-enquiry-error role="alert" tabindex="-1" hidden></p>
-              <p class="enquiry-success" data-enquiry-success role="status" tabindex="-1" hidden></p>
-              <button class="button button-primary" type="submit">Send enquiry <span>→</span></button>
-            </form>
+          <p class="hero-disclosure">No payment at initial submission. A ₹500 fee applies only after eligibility and review.</p>
+          <div class="hero-proof" aria-label="Opportunity overview">
+            <div><strong>128+</strong><span>Active opportunities</span></div>
+            <div><strong>7+</strong><span>Industries covered</span></div>
+            <div><strong>₹26 LPA</strong><span>Salary potential</span></div>
           </div>
+          <p class="stats-source">Opportunity snapshot · August 2026</p>
         </div>
 
+        <div class="hero-card-stack" aria-label="Featured opportunity preview">
+          <article class="match-panel opportunity-preview">
+            <div class="match-panel-top"><span>Featured opportunity</span><span class="live-dot">Applications open</span></div>
+            <div class="opportunity-company"><span class="opportunity-logo"><img src="assets/images/aion-logo.webp" alt="" width="42" height="24" decoding="async"></span><div><strong>AION hiring network</strong><small>Technology partner opportunity</small></div></div>
+            <div class="opportunity-title"><span>Technology</span><h2>Software Engineer</h2><p>Build reliable digital products with a growing technology team.</p></div>
+            <div class="opportunity-tags" aria-label="Opportunity summary"><span>Multiple locations</span><span>Full-time</span><span>Hybrid</span></div>
+            <dl class="opportunity-details"><div><dt>Experience</dt><dd>0–3 years</dd></div><div><dt>Indicative salary</dt><dd>₹5–20 LPA</dd></div></dl>
+            <a class="opportunity-apply" href="?apply=1" data-apply-role="Software Engineer">Apply for this role <span aria-hidden="true">↗</span></a>
+            <p class="opportunity-disclaimer">Preview details are indicative; final employer terms are confirmed during selection.</p>
+          </article>
+        </div>
+      </div>
+      <a class="scroll-cue" href="#about"><span></span>Scroll to explore</a>
+    </section>
+
+    <section class="section intro-section" id="about">
+      <div class="container intro-grid">
+        <div class="section-heading reveal">
+          <p class="kicker">Built around your potential</p>
+          <h2>One place to move your career <em>forward.</em></h2>
+        </div>
+        <div class="intro-copy reveal">
+          <p>AION Tech Career helps candidates understand where they fit, prepare the right information and apply for opportunities aligned with their profile.</p>
+          <div class="value-list">
+            <article><span>01</span><i aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4 6h16M4 12h10M4 18h7"/><path d="m17 16 2 2 4-5"/></svg></i><div><h3>Relevant opportunities</h3><p>Discover roles aligned with your qualification and experience.</p></div></article>
+            <article><span>02</span><i aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg></i><div><h3>Transparent process</h3><p>Know exactly what happens before and after you apply.</p></div></article>
+            <article><span>03</span><i aria-hidden="true"><svg viewBox="0 0 24 24"><path d="m4 17 5-5 4 3 7-8"/><path d="M15 7h5v5"/></svg></i><div><h3>Career growth</h3><p>Find pathways designed around long-term professional progress.</p></div></article>
+          </div>
+        </div>
       </div>
     </section>
 
-    <section class="section enquiry-section" id="legacy-enquiry" aria-hidden="true">
-      <div class="container enquiry-layout">
-        <div class="enquiry-copy reveal">
-          <p class="eyebrow">Have a question?</p>
-          <h2>Send us an <span class="gradient-text">enquiry</span></h2>
-          <p>Ask about job opportunities, eligibility, your application, or hiring through Aion Career. Our team will contact you using the details you provide.</p>
-          <div class="enquiry-details"><span>Email</span><a href="mailto:careers@aioncareer.in">careers@aioncareer.in</a><span>Support hours</span><strong>Mon–Sat, 9:00–18:00</strong></div>
+    <section class="section eligibility-section" id="eligibility">
+      <div class="container">
+        <div class="section-heading eligibility-heading reveal">
+          <div><p class="kicker">Eligibility & salary guide</p><h2>Find the pathway that <em>fits your profile.</em></h2></div>
+          <p>Select the category closest to your qualification. Experience and salary ranges vary by role, employer and location.</p>
         </div>
-        <form class="enquiry-form reveal">
-          <div class="form-grid">
-            <label>Full name <input type="text" name="fullName" autocomplete="name" maxlength="100" placeholder="Your full name" required></label>
-            <label>Email address <input type="email" name="email" autocomplete="email" placeholder="you@example.com" required></label>
-            <label>Phone number <input type="tel" name="phone" autocomplete="tel" pattern="[0-9+() -]{10,18}" placeholder="8050350011" required></label>
-            <label>Enquiry about <select name="enquiryType" required><option value="">Select a topic</option><option>Job opportunities</option><option>Eligibility</option><option>Application status</option><option>Employer enquiry</option><option>Other</option></select></label>
+        <div class="pathway-grid">
+          <article class="pathway-card reveal-card featured-pathway">
+            <div class="pathway-top"><span>01</span><i aria-hidden="true"><svg viewBox="0 0 24 24"><path d="m3 9 9-5 9 5-9 5-9-5Z"/><path d="M7 12v4.5c2.8 2 7.2 2 10 0V12M21 9v6"/></svg></i></div>
+            <p>Category 1</p><h3>Graduates</h3><p>BA, BCom, BSc and related qualifications</p>
+            <dl><div><dt>Experience</dt><dd>Fresher friendly</dd></div><div><dt>Salary range</dt><dd>₹1.8–8 LPA</dd></div></dl>
+            <button type="button" data-apply-qualification="Graduate">Apply as a graduate <span>↗</span></button>
+          </article>
+          <article class="pathway-card reveal-card">
+            <div class="pathway-top"><span>02</span><i aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="12" rx="2"/><path d="M8 20h8M12 16v4M9.5 8.5 7.5 10l2 1.5M14.5 8.5l2 1.5-2 1.5"/></svg></i></div>
+            <p>Category 2</p><h3>Skilled graduates</h3><p>BTech, BBA, BCA, BDS and related qualifications</p>
+            <dl><div><dt>Experience</dt><dd>0–3 years</dd></div><div><dt>Salary range</dt><dd>₹5–20 LPA</dd></div></dl>
+            <button type="button" data-apply-qualification="Skilled graduate">Apply as a skilled graduate <span>↗</span></button>
+          </article>
+          <article class="pathway-card reveal-card">
+            <div class="pathway-top"><span>03</span><i aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M6 3h12v18l-6-3-6 3V3Z"/><path d="M9 8h6M9 12h6"/></svg></i></div>
+            <p>Category 3</p><h3>Postgraduates</h3><p>MA, MCom, MSc and related qualifications</p>
+            <dl><div><dt>Experience</dt><dd>0–3 years</dd></div><div><dt>Salary range</dt><dd>₹3–12 LPA</dd></div></dl>
+            <button type="button" data-apply-qualification="Postgraduate">Apply as a postgraduate <span>↗</span></button>
+          </article>
+          <article class="pathway-card reveal-card">
+            <div class="pathway-top"><span>04</span><i aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="3" y="7" width="18" height="13" rx="2"/><path d="M8 7V5a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2M3 12h18M10 12v2h4v-2"/></svg></i></div>
+            <p>Category 4</p><h3>Skilled postgraduates</h3><p>MBA, MCA, M.Sc (DS) and related qualifications</p>
+            <dl><div><dt>Experience</dt><dd>0–5 years</dd></div><div><dt>Salary range</dt><dd>₹5–26 LPA</dd></div></dl>
+            <button type="button" data-apply-qualification="Skilled postgraduate">Apply as a skilled postgraduate <span>↗</span></button>
+          </article>
+          <article class="pathway-card reveal-card other-pathway">
+            <div class="pathway-top"><span>05</span><i aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M6 3h8l4 4v14H6V3Z"/><path d="M14 3v5h5M9 14h6M12 11v6"/></svg></i></div>
+            <p>Category 5</p><h3>Other qualifications</h3><p>Qualifications and diplomas not mentioned above</p>
+            <dl><div><dt>Experience</dt><dd>Role dependent</dd></div><div><dt>Salary range</dt><dd>₹1.5–7 LPA</dd></div></dl>
+            <button type="button" data-apply-qualification="Diploma / Other">Apply with another qualification <span>↗</span></button>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="section opportunities-section" id="opportunities">
+      <div class="container">
+        <div class="section-heading opportunities-heading reveal">
+          <div><p class="kicker">Industries we hire for</p><h2>Opportunity across <em>growing sectors.</em></h2></div>
+          <p>Explore roles in the industries shaping India’s next chapter of growth.</p>
+        </div>
+        <div class="industry-grid">
+          <article class="industry-card industry-large reveal-card"><div class="industry-count">42 open positions</div><div><span>01 · Technology</span><h3>Build what’s next.</h3><p>Software, data, testing and digital operations.</p><a href="?apply=1" data-apply-role="Software Engineer">Apply in technology <span>↗</span></a></div></article>
+          <article class="industry-card reveal-card"><div class="industry-count">24 open positions</div><div><span>02 · Banking</span><h3>Power financial progress.</h3><p>Branch, lending and financial operations.</p><a href="?apply=1" data-apply-role="Branch Operations Executive">Apply in banking <span>↗</span></a></div></article>
+          <article class="industry-card reveal-card"><div class="industry-count">18 open positions</div><div><span>03 · Healthcare</span><h3>Make care count.</h3><p>Clinical support, care and administration.</p><a href="?apply=1" data-apply-role="Healthcare Administration Associate">Apply in healthcare <span>↗</span></a></div></article>
+          <article class="industry-card reveal-card"><div class="industry-count">16 open positions</div><div><span>04 · Manufacturing</span><h3>Create at scale.</h3><p>Quality, production, logistics and operations.</p><a href="?apply=1" data-apply-role="Quality Assurance Executive">Apply in manufacturing <span>↗</span></a></div></article>
+          <article class="industry-card reveal-card"><div class="industry-count">28 open positions</div><div><span>05 · Customer support</span><h3>Turn service into trust.</h3><p>Customer success, KPO and BPO services.</p><a href="?apply=1" data-apply-role="Customer Success Associate">Apply in customer support <span>↗</span></a></div></article>
+          <article class="industry-card industry-wide reveal-card"><div class="industry-count">21 open positions</div><div><span>06 · Sales & marketing</span><h3>Move ideas into markets.</h3><p>Growth, consulting and client-facing roles.</p><a href="?apply=1" data-apply-role="Business Development Associate">Apply in sales & marketing <span>↗</span></a></div></article>
+        </div>
+        <p class="industry-note">Industry figures may overlap where one opportunity supports more than one sector.</p>
+      </div>
+    </section>
+
+    <section class="section process-section" id="process">
+      <div class="container process-layout">
+        <div class="process-intro reveal">
+          <p class="kicker">Application process</p>
+          <h2>Five clear steps. <em>No guesswork.</em></h2>
+          <p>We keep the journey straightforward, so you always know what comes next.</p>
+          <div class="fee-note"><span>Important</span><p>A ₹500 application fee completes your submission after eligibility and review.</p></div>
+        </div>
+        <div class="process-list">
+          <article class="process-step reveal"><span>01</span><div><h3>Check eligibility</h3><p>Choose the category that matches your education and skills.</p></div><i>✓</i></article>
+          <article class="process-step reveal"><span>02</span><div><h3>Complete your application</h3><p>Add your personal, education and contact information.</p></div><i>↗</i></article>
+          <article class="process-step reveal"><span>03</span><div><h3>Document verification</h3><p>Submit your résumé, ID proof and education certificate.</p></div><i>□</i></article>
+          <article class="process-step reveal"><span>04</span><div><h3>Interview & selection</h3><p>Meet the hiring team and demonstrate your fit.</p></div><i>◎</i></article>
+          <article class="process-step reveal"><span>05</span><div><h3>Receive your final update</h3><p>Get your status and clear next-step guidance.</p></div><i>→</i></article>
+        </div>
+      </div>
+    </section>
+
+    <section class="section contact-section" id="contact">
+      <div class="container contact-shell">
+        <div class="contact-copy reveal">
+          <p class="kicker">Talk to our career team</p>
+          <h2>Have a question before you <em>apply?</em></h2>
+          <p>Ask about opportunities, eligibility, your application or hiring through AION Tech Career.</p>
+          <div class="contact-details">
+            <div><span>Email</span><a href="mailto:careers@aioncareer.in">careers@aioncareer.in</a></div>
+            <div><span>Phone</span><a href="tel:+918050350011">+91 80503 50011</a></div>
+            <div><span>Support hours</span><strong>Mon–Sat · 9:00–18:00</strong></div>
           </div>
-          <label>Your message <textarea name="message" rows="5" maxlength="2000" placeholder="How can we help you?" required></textarea></label>
-          <p class="form-error" data-enquiry-error role="alert" tabindex="-1" hidden></p>
-          <p class="enquiry-success" data-enquiry-success role="status" tabindex="-1" hidden></p>
-          <button class="button button-primary" type="submit">Send enquiry <span>→</span></button>
+        </div>
+        <form class="enquiry-form reveal" data-enquiry-form>
+          <div class="form-heading"><span>Quick enquiry</span><h3>Tell us how we can help.</h3></div>
+          <div class="form-grid">
+            <label>Full name<input type="text" name="fullName" autocomplete="name" maxlength="100" placeholder="Your full name" required></label>
+            <label>Email address<input type="email" name="email" autocomplete="email" placeholder="you@example.com" required></label>
+            <label>Phone number<input type="tel" name="phone" autocomplete="tel" pattern="[0-9+() -]{10,18}" placeholder="+91 80503 50011" required></label>
+            <label>Enquiry about<select name="enquiryType" required><option value="">Select a topic</option><option>Job opportunities</option><option>Eligibility</option><option>Application status</option><option>Employer enquiry</option><option>Other</option></select></label>
+            <label class="form-span-2">Employment / qualification category<select name="qualification" required><option value="">Select the closest category</option><option>Graduate</option><option>Skilled graduate</option><option>Postgraduate</option><option>Skilled postgraduate</option><option>Diploma / Other</option><option>Employer / recruiter</option><option>Not sure</option></select></label>
+          </div>
+          <label>Your message<textarea name="message" rows="4" maxlength="2000" placeholder="How can our team help you?" required></textarea></label>
+          <p class="form-message form-error" data-enquiry-error role="alert" tabindex="-1" hidden></p>
+          <p class="form-message form-success" data-enquiry-success role="status" tabindex="-1" hidden></p>
+          <button class="button button-bright" type="submit">Send enquiry <span>↗</span></button>
         </form>
       </div>
     </section>
 
-    <section class="stats-section reveal" aria-label="Aion Career statistics">
-      <div class="container stats-strip">
-        <div><strong data-count="128" data-suffix="+">0</strong><span>Active opportunities</span></div>
-        <div><strong data-count="7" data-suffix="+">0</strong><span>Industries covered</span></div>
-        <div><strong data-count="4200" data-suffix="+">0</strong><span>Applications processed</span></div>
-        <div><strong data-count="860" data-suffix="+">0</strong><span>Successful candidates</span></div>
-      </div>
-    </section>
-
-    <section class="section reveal" id="eligibility">
-      <div class="container">
-        <div class="section-heading">
-          <p class="eyebrow">Eligibility & salary</p>
-          <h2>Find opportunities that <span class="gradient-text static-letter-flip" data-letter-flip-static>match your profile</span></h2>
-          <p>Choose your preferences to focus on the most relevant career pathway.</p>
-        </div>
-        <div class="eligibility-cards">
-          <article class="eligibility-card reveal-card"><span class="card-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="m3 9 9-5 9 5-9 5-9-5Z"/><path d="M7 12v4.5c2.8 2 7.2 2 10 0V12M21 9v6"/></svg></span><small>Category 1</small><h3>Graduates</h3><p>BA, BCom, BSc and related qualifications</p><dl><div><dt>Experience</dt><dd>Fresher friendly</dd></div><div><dt>Salary</dt><dd>₹1.8–8 LPA</dd></div></dl><button type="button" class="eligibility-apply" data-apply-qualification="Graduate">Apply as a graduate <span>→</span></button></article>
-          <article class="eligibility-card reveal-card"><span class="card-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="12" rx="2"/><path d="M8 20h8M12 16v4M9.5 8.5 7.5 10l2 1.5M14.5 8.5l2 1.5-2 1.5"/></svg></span><small>Category 2</small><h3>Skilled graduates</h3><p>BTech, BBA, BCA, BDS and related qualifications</p><dl><div><dt>Experience</dt><dd>0–3 years</dd></div><div><dt>Salary</dt><dd>₹5–20 LPA</dd></div></dl><button type="button" class="eligibility-apply" data-apply-qualification="Skilled graduate">Apply as a skilled graduate <span>→</span></button></article>
-          <article class="eligibility-card reveal-card"><span class="card-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M6 3h12v18l-6-3-6 3V3Z"/><path d="M9 8h6M9 12h6"/></svg></span><small>Category 3</small><h3>Postgraduates</h3><p>MA, MCom, MSc and related qualifications</p><dl><div><dt>Experience</dt><dd>0–3 years</dd></div><div><dt>Salary</dt><dd>₹3–12 LPA</dd></div></dl><button type="button" class="eligibility-apply" data-apply-qualification="Postgraduate">Apply as a postgraduate <span>→</span></button></article>
-          <article class="eligibility-card reveal-card"><span class="card-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="3" y="7" width="18" height="13" rx="2"/><path d="M8 7V5a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2M3 12h18M10 12v2h4v-2"/></svg></span><small>Category 4</small><h3>Skilled postgraduates</h3><p>MBA, MCA, M.Sc (DS) and related qualifications</p><dl><div><dt>Experience</dt><dd>0–5 years</dd></div><div><dt>Salary</dt><dd>₹5–26 LPA</dd></div></dl><button type="button" class="eligibility-apply" data-apply-qualification="Skilled postgraduate">Apply as a skilled postgraduate <span>→</span></button></article>
-          <article class="eligibility-card reveal-card"><span class="card-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M6 3h8l4 4v14H6V3Z"/><path d="M14 3v5h5M9 14h6M12 11v6"/></svg></span><small>Category 5</small><h3>Other qualifications</h3><p>Qualifications and diplomas not mentioned above</p><dl><div><dt>Experience</dt><dd>Role dependent</dd></div><div><dt>Salary</dt><dd>₹1.5–7 LPA</dd></div></dl><button type="button" class="eligibility-apply" data-apply-qualification="Diploma / Other">Apply with other qualification <span>→</span></button></article>
-        </div>
-      </div>
-    </section>
-
-    <section class="section section-alt reveal" id="industries">
-      <div class="container">
-        <div class="section-heading">
-          <p class="eyebrow">Industries we hire for</p>
-          <h2>Opportunity across <span class="gradient-text static-letter-flip" data-letter-flip-static>growing sectors</span></h2>
-          <p>Explore roles in the industries shaping India’s next chapter of growth.</p>
-        </div>
-        <div class="bento-grid">
-          <article class="industry-card industry-feature"><span class="industry-icon">⌘</span><div><small>42 open positions</small><h3>Technology</h3><p>Build products, systems and digital experiences across software, data, testing and operations.</p><a href="?apply=1" data-open-application>Explore roles <span>→</span></a></div></article>
-          <article class="industry-card"><span class="industry-icon">₹</span><div><small>24 open positions</small><h3>Banking</h3><p>Branch, lending and financial operations.</p><a href="?apply=1" data-open-application>Explore roles <span>→</span></a></div></article>
-          <article class="industry-card"><span class="industry-icon">＋</span><div><small>18 open positions</small><h3>Healthcare</h3><p>Care, clinical support and administration.</p><a href="?apply=1" data-open-application>Explore roles <span>→</span></a></div></article>
-          <article class="industry-card"><span class="industry-icon">◇</span><div><small>16 open positions</small><h3>Manufacturing</h3><p>Quality, production, logistics and operations.</p><a href="?apply=1" data-open-application>Explore roles <span>→</span></a></div></article>
-          <article class="industry-card industry-wide"><span class="industry-icon">◎</span><div><small>28 open positions</small><h3>Customer Support</h3><p>Customer success, KPO and BPO services.</p><a href="?apply=1" data-open-application>Explore roles <span>→</span></a></div></article>
-          <article class="industry-card"><span class="industry-icon">↗</span><div><small>21 open positions</small><h3>Sales & Marketing</h3><p>Growth, consulting and client-facing roles.</p><a href="?apply=1" data-open-application>Explore roles <span>→</span></a></div></article>
-        </div>
-      </div>
-    </section>
-
-    <section class="section reveal" id="process">
-      <div class="container">
-        <div class="section-heading centered">
-          <p class="eyebrow">Application process</p>
-          <h2>A clear path from profile to <span class="gradient-text static-letter-flip" data-letter-flip-static>opportunity</span></h2>
-          <p>Five transparent steps. No guesswork.</p>
-        </div>
-        <div class="timeline" data-timeline>
-          <div class="timeline-progress"></div>
-          <article><span>01</span><i>✓</i><h3>Check eligibility</h3><p>Choose the category that matches your education and skills.</p></article>
-          <article><span>02</span><i>✎</i><h3>Complete application</h3><p>Add your personal, education and contact information.</p></article>
-          <article><span>03</span><i>▣</i><h3>Document verification</h3><p>Submit your resume, ID proof and education certificate.</p></article>
-          <article><span>04</span><i>◉</i><h3>Interview & selection</h3><p>Meet the hiring team and demonstrate your fit.</p></article>
-          <article><span>05</span><i>→</i><h3>Receive final update</h3><p>Get your final status and next-step guidance.</p></article>
-        </div>
-        <p class="process-note">A ₹500 application fee completes your submission after eligibility and review.</p>
-      </div>
-    </section>
-
-    <section class="section cta-section reveal">
-      <div class="container cta-panel">
-        <div><p class="eyebrow">Your next chapter</p><h2>Ready to take the <span class="gradient-text static-letter-flip" data-letter-flip-static>next step?</span></h2><p>Find an opportunity that matches your skills, experience and ambitions.</p></div>
-        <div class="cta-actions"><a href="#industries" class="button button-secondary">Explore opportunities</a><a href="?apply=1" class="button button-primary" data-open-application>Start application <span>→</span></a></div>
+    <section class="final-cta">
+      <div class="container final-cta-inner reveal">
+        <div><p class="kicker">Your next chapter</p><h2>Ready to find where you <em>belong?</em></h2><p>Discover opportunities that match your skills, experience and ambition.</p></div>
+        <a class="button button-light" href="?apply=1" data-open-application>Start your application <span>↗</span></a>
       </div>
     </section>
   </main>
 
-  <footer class="site-footer" id="contact">
+  <footer class="site-footer">
     <div class="container footer-grid">
-      <div class="footer-brand"><a class="brand" href="#top"><img class="brand-logo brand-logo-footer" src="assets/images/aion-logo.png" alt="Aion Career"><strong>Aion Career</strong></a><p>A trusted career launchpad connecting talent with meaningful opportunities across India’s growing industries.</p><div class="socials" aria-label="Social channels coming soon"><span title="LinkedIn coming soon">in</span><span title="Instagram coming soon">ig</span><span title="X coming soon">x</span></div></div>
-      <div><h3>Quick links</h3><a href="#top">Home</a><a href="#eligibility">Eligibility</a><a href="#process">Application process</a></div>
-      <div><h3>Industries</h3><a href="#industries">Technology</a><a href="#industries">Banking</a><a href="#industries">Healthcare</a><a href="#industries">Manufacturing</a></div>
+      <div class="footer-about"><a class="brand footer-brand" href="#top"><img src="assets/images/aion-logo.webp" alt="" width="78" height="43" loading="lazy" decoding="async"><span class="brand-copy"><strong>AION TECH</strong><em>CAREER</em></span></a><p>Connecting talent with meaningful opportunities across India’s growing industries.</p></div>
+      <div><h3>Navigate</h3><a href="#top">Home</a><a href="#about">About</a><a href="#eligibility">Eligibility</a><a href="#opportunities">Industries</a><a href="#process">Application process</a></div>
       <div><h3>Candidate resources</h3><a href="#eligibility">Salary guide</a><a href="#process">Documents required</a><a href="#process">Interview process</a></div>
-      <div><h3>Contact</h3><p>India</p><a href="tel:+918050350011">8050350011</a><a href="mailto:careers@aioncareer.in">careers@aioncareer.in</a><p>Mon–Sat, 9:00–18:00</p></div>
+      <div><h3>Contact</h3><a href="tel:+918050350011">+91 80503 50011</a><a href="mailto:careers@aioncareer.in">careers@aioncareer.in</a><p>India · Mon–Sat, 9:00–18:00</p></div>
     </div>
-    <div class="container footer-bottom"><span>© 2026 Aion Career. All rights reserved.</span></div>
+    <div class="container footer-bottom"><span>© 2026 AION Tech Career. All rights reserved.</span><span class="footer-legal"><a href="privacy.html">Privacy</a><a href="terms.html">Terms</a><a href="#top">Back to top ↑</a></span></div>
   </footer>
 
-  <div class="application-modal" data-application-modal hidden><div class="modal-backdrop" data-close-application></div><section class="application-dialog" role="dialog" aria-modal="true" aria-labelledby="application-title">
-    <button class="modal-close" type="button" aria-label="Close application form" data-close-application>×</button>
-    <div class="application-intro"><p class="eyebrow">Job application</p><h2 id="application-title">Submit your <span class="gradient-text">application</span></h2><p>Your education category is selected automatically. Choose the role you are looking for and complete your details.</p></div>
-    <form class="application-form" data-application-form><div class="form-grid">
-      <label>Role you are looking for <select name="role" data-role-input required><option value="">Select a role</option><optgroup label="Technology"><option>Software Engineer</option><option>Data Analyst</option></optgroup><optgroup label="Banking"><option>Branch Operations Executive</option></optgroup><optgroup label="Customer service"><option>Customer Success Associate</option></optgroup><optgroup label="Manufacturing"><option>Quality Assurance Executive</option></optgroup><optgroup label="Sales &amp; Marketing"><option>Business Development Associate</option></optgroup></select></label>
-      <label>Full name <input type="text" name="fullName" autocomplete="name" placeholder="Your full name" required></label><label>Email address <input type="email" name="email" autocomplete="email" placeholder="you@example.com" required></label>
-      <label>Phone number <input type="tel" name="phone" autocomplete="tel" placeholder="8050350011" pattern="[0-9+() -]{10,18}" required></label><label>Current location <input type="text" name="location" autocomplete="address-level2" placeholder="City, State" required></label>
-      <label>Highest qualification<select name="qualification" required><option value="">Select qualification</option><option>Graduate</option><option>Skilled graduate</option><option>Postgraduate</option><option>Skilled postgraduate</option><option>Diploma / Other</option></select></label>
-      <label>Experience<select name="experience" required><option value="">Select experience</option><option>Fresher</option><option>Less than 1 year</option><option>1–3 years</option><option>3–5 years</option><option>5+ years</option></select></label>
-    </div><label>Resume <input class="file-input" type="file" name="resume" accept=".pdf,.doc,.docx" required><small>PDF, DOC or DOCX · Maximum 5 MB</small></label><label>Why are you a good fit? <textarea name="message" rows="4" maxlength="2000" placeholder="Briefly tell us about your skills and experience"></textarea></label><label class="consent-field"><input type="checkbox" name="consent" required><span>I confirm that the information provided is accurate and agree to be contacted about this application.</span></label><p class="form-error" data-form-error role="alert" tabindex="-1" hidden></p><div class="application-actions"><button class="button button-primary" type="submit">Submit application <span>→</span></button><button class="button button-secondary" type="button" data-close-application>Cancel</button></div></form>
-    <div class="application-success" data-application-success hidden><span>✓</span><h2>Application received</h2><p>Thank you for applying. We’ll review your profile and contact you with the next steps.</p><p class="application-reference" data-application-reference></p><button class="button button-primary" type="button" data-close-application>Done</button></div>
-  </section></div>
+  <div class="application-modal" data-application-modal hidden>
+    <div class="modal-backdrop" data-close-application></div>
+    <section class="application-dialog" role="dialog" aria-modal="true" aria-labelledby="application-title">
+      <button class="modal-close" type="button" aria-label="Close application form" data-close-application>×</button>
+      <div class="application-intro"><p class="kicker">Job application</p><h2 id="application-title">Take the next step.</h2><p>Choose your role, complete your details and upload your résumé. No payment is required now; a ₹500 fee applies only after eligibility and review.</p></div>
+      <form class="application-form" data-application-form>
+        <div class="form-grid">
+          <label>Role you are looking for<select name="role" data-role-input required><option value="">Select a role</option><optgroup label="Technology"><option>Software Engineer</option><option>Data Analyst</option></optgroup><optgroup label="Banking"><option>Branch Operations Executive</option></optgroup><optgroup label="Healthcare"><option>Healthcare Administration Associate</option></optgroup><optgroup label="Customer service"><option>Customer Success Associate</option></optgroup><optgroup label="Manufacturing"><option>Quality Assurance Executive</option></optgroup><optgroup label="Sales &amp; Marketing"><option>Business Development Associate</option></optgroup></select></label>
+          <label>Highest qualification<select name="qualification" required><option value="">Select qualification</option><option>Graduate</option><option>Skilled graduate</option><option>Postgraduate</option><option>Skilled postgraduate</option><option>Diploma / Other</option></select></label>
+          <label>Full name<input type="text" name="fullName" autocomplete="name" placeholder="Your full name" required></label>
+          <label>Email address<input type="email" name="email" autocomplete="email" placeholder="you@example.com" required></label>
+          <label>Phone number<input type="tel" name="phone" autocomplete="tel" placeholder="+91 80503 50011" pattern="[0-9+() -]{10,18}" required></label>
+          <label>Current location<input type="text" name="location" autocomplete="address-level2" placeholder="City, State" required></label>
+          <label>Experience<select name="experience" required><option value="">Select experience</option><option>Fresher</option><option>Less than 1 year</option><option>1–3 years</option><option>3–5 years</option><option>5+ years</option></select></label>
+          <label>Résumé<input class="file-input" type="file" name="resume" accept=".pdf,.doc,.docx" required><small>PDF, DOC or DOCX · Maximum 5 MB</small></label>
+        </div>
+        <label>Why are you a good fit?<textarea name="message" rows="4" maxlength="2000" placeholder="Briefly tell us about your skills and experience"></textarea></label>
+        <label class="consent-field"><input type="checkbox" name="consent" required><span>I confirm that the information provided is accurate and agree to be contacted about this application.</span></label>
+        <p class="form-message form-error" data-form-error role="alert" tabindex="-1" hidden></p>
+        <div class="application-actions"><button class="button button-bright" type="submit">Submit application <span>↗</span></button><button class="button button-outline" type="button" data-close-application>Cancel</button></div>
+      </form>
+      <div class="application-success" data-application-success hidden><span>✓</span><h2>Application received.</h2><p>Thank you for applying. We’ll review your profile and contact you with the next steps.</p><p data-application-reference></p><button class="button button-bright" type="button" data-close-application>Done</button></div>
+    </section>
+  </div>
 </body>
 </html>

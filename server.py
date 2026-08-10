@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import json
 import os
+import posixpath
 import re
 import secrets
 import sqlite3
@@ -13,7 +14,7 @@ from email.policy import default
 from http import HTTPStatus
 from http.server import SimpleHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
-from urllib.parse import urlsplit
+from urllib.parse import unquote, urlsplit
 
 
 ROOT = Path(__file__).resolve().parent
@@ -35,6 +36,7 @@ ROLES = {
     "Software Engineer",
     "Data Analyst",
     "Branch Operations Executive",
+    "Healthcare Administration Associate",
     "Customer Success Associate",
     "Quality Assurance Executive",
     "Business Development Associate",
@@ -43,6 +45,7 @@ QUALIFICATIONS = {
     "Graduate", "Skilled graduate", "Postgraduate",
     "Skilled postgraduate", "Diploma / Other",
 }
+ENQUIRY_CATEGORIES = QUALIFICATIONS | {"Employer / recruiter", "Not sure"}
 EXPERIENCE_LEVELS = {
     "Fresher", "Less than 1 year", "1–3 years", "3–5 years", "5+ years",
 }
@@ -80,12 +83,20 @@ def initialize_database() -> None:
                 email TEXT NOT NULL,
                 phone TEXT NOT NULL,
                 enquiry_type TEXT NOT NULL,
+                qualification TEXT NOT NULL DEFAULT '',
                 message TEXT NOT NULL,
                 submitted_at TEXT NOT NULL,
                 status TEXT NOT NULL DEFAULT 'new'
             )
             """
         )
+        enquiry_columns = {
+            row[1] for row in connection.execute("PRAGMA table_info(enquiries)")
+        }
+        if "qualification" not in enquiry_columns:
+            connection.execute(
+                "ALTER TABLE enquiries ADD COLUMN qualification TEXT NOT NULL DEFAULT ''"
+            )
 
 
 class ApplicationHandler(SimpleHTTPRequestHandler):
@@ -98,11 +109,51 @@ class ApplicationHandler(SimpleHTTPRequestHandler):
         """Run safely without an attached console or stderr stream."""
         return
 
-    def do_GET(self) -> None:
-        if urlsplit(self.path).path == "/api/health":
-            self.send_json(HTTPStatus.OK, {"status": "ok"})
+    def end_headers(self) -> None:
+        """Apply baseline security headers to API and static responses."""
+        self.send_header("X-Content-Type-Options", "nosniff")
+        self.send_header("X-Frame-Options", "DENY")
+        self.send_header("Referrer-Policy", "strict-origin-when-cross-origin")
+        self.send_header("Permissions-Policy", "camera=(), microphone=(), geolocation=()")
+        self.send_header("Cross-Origin-Opener-Policy", "same-origin")
+        self.send_header(
+            "Content-Security-Policy",
+            "default-src 'self'; script-src 'self'; "
+            "style-src 'self' https://fonts.googleapis.com; "
+            "font-src https://fonts.gstatic.com; img-src 'self' data:; "
+            "connect-src 'self'; object-src 'none'; base-uri 'self'; "
+            "form-action 'self'; frame-ancestors 'none'",
+        )
+        if self._request_path().startswith("/assets/"):
+            self.send_header("Cache-Control", "public, max-age=86400")
+        super().end_headers()
+
+    def _request_path(self) -> str:
+        """Return a decoded, normalized URL path for allowlist checks."""
+        path = unquote(urlsplit(self.path).path)
+        return posixpath.normpath("/" + path.lstrip("/"))
+
+    def _is_public_path(self) -> bool:
+        path = self._request_path()
+        return path in {"/", "/index.html", "/privacy.html", "/terms.html"} or path.startswith("/assets/")
+
+    def _serve_public_file(self) -> None:
+        if not self._is_public_path():
+            self.send_error(HTTPStatus.NOT_FOUND, "Not found")
             return
         super().do_GET()
+
+    def do_GET(self) -> None:
+        if self._request_path() == "/api/health":
+            self.send_json(HTTPStatus.OK, {"status": "ok"})
+            return
+        self._serve_public_file()
+
+    def do_HEAD(self) -> None:
+        if not self._is_public_path():
+            self.send_error(HTTPStatus.NOT_FOUND, "Not found")
+            return
+        super().do_HEAD()
 
     def do_POST(self) -> None:
         endpoint = urlsplit(self.path).path
@@ -128,7 +179,7 @@ class ApplicationHandler(SimpleHTTPRequestHandler):
             self.send_json(HTTPStatus.BAD_REQUEST, {"error": "Invalid enquiry data."})
             return
 
-        required = ("fullName", "email", "phone", "enquiryType", "message")
+        required = ("fullName", "email", "phone", "enquiryType", "qualification", "message")
         if any(not isinstance(fields.get(name), str) or not fields[name].strip() for name in required):
             self.send_json(HTTPStatus.BAD_REQUEST, {"error": "Please complete all required fields."})
             return
@@ -140,7 +191,12 @@ class ApplicationHandler(SimpleHTTPRequestHandler):
             self.send_json(HTTPStatus.BAD_REQUEST, {"error": "Please enter a valid phone number."})
             return
         enquiry_types = {"Job opportunities", "Eligibility", "Application status", "Employer enquiry", "Other"}
-        if fields["enquiryType"] not in enquiry_types or len(fields["fullName"]) > 100 or len(fields["message"]) > 2000:
+        if (
+            fields["enquiryType"] not in enquiry_types
+            or fields["qualification"] not in ENQUIRY_CATEGORIES
+            or len(fields["fullName"]) > 100
+            or len(fields["message"]) > 2000
+        ):
             self.send_json(HTTPStatus.BAD_REQUEST, {"error": "Please check your enquiry details."})
             return
 
@@ -148,11 +204,12 @@ class ApplicationHandler(SimpleHTTPRequestHandler):
         with sqlite3.connect(DATABASE) as connection:
             connection.execute(
                 """INSERT INTO enquiries
-                (id, full_name, email, phone, enquiry_type, message, submitted_at)
-                VALUES (?, ?, ?, ?, ?, ?, ?)""",
+                (id, full_name, email, phone, enquiry_type, qualification, message, submitted_at)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?)""",
                 (
                     enquiry_id, fields["fullName"], fields["email"].lower(), fields["phone"],
-                    fields["enquiryType"], fields["message"], datetime.now(timezone.utc).isoformat(),
+                    fields["enquiryType"], fields["qualification"], fields["message"],
+                    datetime.now(timezone.utc).isoformat(),
                 ),
             )
         self.send_json(HTTPStatus.CREATED, {"message": "Enquiry received.", "enquiryId": enquiry_id})

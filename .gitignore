@@ -5,5 +5,7 @@ data/
 __pycache__/
 *.pyc
 .layout-check.png
+.layout-check-*.png
+ui-*.png
 .chrome-test/
 readme.local-backup.txt

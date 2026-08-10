@@ -1,323 +1,103 @@
 document.addEventListener("DOMContentLoaded", () => {
-  const page = window.location.pathname.split("/").pop() || "index.html";
-
-  const root = document.documentElement;
-  const themeButtons = document.querySelectorAll("[data-theme-toggle]");
-  const systemTheme = window.matchMedia("(prefers-color-scheme: light)");
-  let savedTheme = null;
-  try { savedTheme = window.localStorage.getItem("aion-theme"); } catch (_) {}
-
-  const applyTheme = (theme) => {
-    root.dataset.theme = theme;
-    const nextTheme = theme === "dark" ? "light" : "dark";
-    themeButtons.forEach((button) => {
-      button.setAttribute("aria-label", `Switch to ${nextTheme} mode`);
-      button.setAttribute("title", `Switch to ${nextTheme} mode`);
-      button.setAttribute("aria-pressed", String(theme === "light"));
-    });
-  };
-
-  applyTheme(savedTheme || (systemTheme.matches ? "light" : "dark"));
-  themeButtons.forEach((button) => button.addEventListener("click", () => {
-    const theme = root.dataset.theme === "light" ? "dark" : "light";
-    applyTheme(theme);
-    savedTheme = theme;
-    try { window.localStorage.setItem("aion-theme", theme); } catch (_) {}
-  }));
-  systemTheme.addEventListener?.("change", (event) => {
-    if (!savedTheme) applyTheme(event.matches ? "light" : "dark");
-  });
-
-  const flippingWord = document.querySelector("[data-flipping-word]");
   const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-  const mobileViewport = window.matchMedia("(max-width: 560px)").matches;
-  const brandSplash = document.querySelector("[data-brand-splash]");
-  if (brandSplash) {
-    if (reduceMotion) {
-      brandSplash.remove();
-      document.body.classList.remove("splash-active");
-    } else if (mobileViewport) {
-      brandSplash.classList.add("is-static");
-      window.setTimeout(() => {
-        brandSplash.remove();
-        document.body.classList.remove("splash-active");
-      }, 3000);
-    } else {
-      const dockSplashIntoHeader = () => {
-        const splashContent = brandSplash.querySelector(".brand-splash-content");
-        const headerBrand = document.querySelector(".site-header .brand");
+  const header = document.querySelector("[data-header]");
+  const menuToggle = document.querySelector("[data-menu-toggle]");
+  const navPanel = document.querySelector("[data-nav-panel]");
 
-        brandSplash.classList.add("is-docking");
-
-        const animateInto = (source, target) => {
-          if (!source || !target) return;
-          const from = source.getBoundingClientRect();
-          const to = target.getBoundingClientRect();
-          const landingAnimation = source.animate([
-            { transform: "translate(0, 0) scale(1)", opacity: 1 },
-            {
-              transform: `translate(${to.left - from.left}px, ${to.top - from.top}px) scale(${to.width / from.width}, ${to.height / from.height})`,
-              opacity: 1
-            }
-          ], {
-            duration: 950,
-            easing: "cubic-bezier(.16, 1, .3, 1)",
-            fill: "forwards"
-          });
-          landingAnimation.addEventListener("finish", () => {
-            source.style.opacity = "0";
-          }, { once: true });
-        };
-
-        animateInto(splashContent, headerBrand);
-        window.setTimeout(() => brandSplash.classList.add("is-exiting"), 1000);
-      };
-
-      window.setTimeout(dockSplashIntoHeader, 4850);
-      window.setTimeout(() => {
-        brandSplash.remove();
-        document.body.classList.remove("splash-active");
-      }, 6500);
+  let previousY = window.scrollY;
+  let ticking = false;
+  const updateHeader = () => {
+    const currentY = Math.max(window.scrollY, 0);
+    header?.classList.toggle("scrolled", currentY > 20);
+    header?.classList.toggle("header-hidden", currentY > 180 && currentY > previousY && !navPanel?.classList.contains("open"));
+    previousY = currentY;
+    ticking = false;
+  };
+  window.addEventListener("scroll", () => {
+    if (!ticking) {
+      window.requestAnimationFrame(updateHeader);
+      ticking = true;
     }
-  }
-  const createLetterNodes = (text) => Array.from(text, (letter, index) => {
-    const character = document.createElement("span");
-    character.className = "flip-letter";
-    character.style.setProperty("--letter-index", index);
-    character.textContent = letter === " " ? "\u00a0" : letter;
-    return character;
+  }, { passive: true });
+  updateHeader();
+
+  const closeMenu = () => {
+    menuToggle?.setAttribute("aria-expanded", "false");
+    menuToggle?.setAttribute("aria-label", "Open navigation");
+    navPanel?.classList.remove("open");
+  };
+  menuToggle?.addEventListener("click", () => {
+    const open = menuToggle.getAttribute("aria-expanded") !== "true";
+    menuToggle.setAttribute("aria-expanded", String(open));
+    menuToggle.setAttribute("aria-label", open ? "Close navigation" : "Open navigation");
+    navPanel?.classList.toggle("open", open);
+    header?.classList.remove("header-hidden");
   });
+  navPanel?.querySelectorAll("a").forEach((link) => link.addEventListener("click", closeMenu));
 
-  if (flippingWord && !reduceMotion) {
-    const words = ["deserve.", "envision.", "choose."];
-    let wordIndex = 0;
-    const renderWord = (word) => {
-      flippingWord.replaceChildren(...createLetterNodes(word));
-    };
-
-    renderWord(words[wordIndex]);
-    window.setInterval(() => {
-      flippingWord.classList.add("is-exiting");
-      window.setTimeout(() => {
-        wordIndex = (wordIndex + 1) % words.length;
-        renderWord(words[wordIndex]);
-        flippingWord.classList.remove("is-exiting");
-        flippingWord.classList.add("is-entering");
-        window.setTimeout(() => {
-          flippingWord.classList.remove("is-entering");
-        }, 580);
-      }, 480);
-    }, 2200);
-  }
-
-  const staticFlipText = document.querySelectorAll("[data-letter-flip-static]");
-  staticFlipText.forEach((element) => {
-    const text = element.textContent;
-    if (reduceMotion) return;
-    element.setAttribute("aria-label", text);
-    element.replaceChildren(...createLetterNodes(text));
-  });
-  if (!reduceMotion && staticFlipText.length) {
-    const flipObserver = new IntersectionObserver((entries, observer) => {
+  const revealItems = [...document.querySelectorAll(".reveal, .reveal-card")];
+  if (!reduceMotion && "IntersectionObserver" in window) {
+    document.body.classList.add("motion-ready");
+    const revealObserver = new IntersectionObserver((entries, observer) => {
       entries.forEach((entry) => {
         if (!entry.isIntersecting) return;
         entry.target.classList.add("is-visible");
         observer.unobserve(entry.target);
       });
-    }, { threshold: 0.45 });
-    staticFlipText.forEach((element) => flipObserver.observe(element));
-  }
-
-  const header = document.querySelector("[data-header]");
-  const menuButton = document.querySelector(".menu-toggle");
-  const navigation = document.querySelector(".header-actions");
-
-  let previousScrollY = window.scrollY;
-  let headerTicking = false;
-
-  const updateHeader = () => {
-    if (!header) return;
-
-    const currentScrollY = Math.max(window.scrollY, 0);
-    const scrollingDown = currentScrollY > previousScrollY;
-    const menuOpen = navigation?.classList.contains("open");
-
-    header.classList.toggle("scrolled", currentScrollY > 12);
-    header.classList.toggle(
-      "header-hidden",
-      scrollingDown && currentScrollY > 120 && !menuOpen
-    );
-
-    previousScrollY = currentScrollY;
-    headerTicking = false;
-  };
-
-  const requestHeaderUpdate = () => {
-    if (!headerTicking) {
-      window.requestAnimationFrame(updateHeader);
-      headerTicking = true;
-    }
-  };
-
-  updateHeader();
-  window.addEventListener("scroll", requestHeaderUpdate, { passive: true });
-
-  menuButton?.addEventListener("click", () => {
-    const open = menuButton.getAttribute("aria-expanded") !== "true";
-    menuButton.setAttribute("aria-expanded", String(open));
-    menuButton.setAttribute("aria-label", open ? "Close header controls" : "Open header controls");
-    navigation?.classList.toggle("open", open);
-    header?.classList.remove("header-hidden");
-  });
-
-  navigation?.querySelectorAll("a").forEach((link) => {
-    link.addEventListener("click", () => {
-      menuButton?.setAttribute("aria-expanded", "false");
-      menuButton?.setAttribute("aria-label", "Open header controls");
-      navigation.classList.remove("open");
-    });
-  });
-
-  document.addEventListener("keydown", (event) => {
-    if (event.key === "Escape" && navigation?.classList.contains("open")) {
-      menuButton?.click();
-      menuButton?.focus();
-    }
-  });
-
-  const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-  const revealItems = document.querySelectorAll(".reveal, .reveal-card");
-
-  if (reducedMotion || !("IntersectionObserver" in window)) {
-    revealItems.forEach((item) => item.classList.add("is-visible"));
-  } else {
-    const revealObserver = new IntersectionObserver((entries, observer) => {
-      entries.forEach((entry) => {
-        if (entry.isIntersecting) {
-          entry.target.classList.add("is-visible");
-          observer.unobserve(entry.target);
-        }
-      });
-    }, { threshold: 0.12 });
+    }, { threshold: 0.08, rootMargin: "0px 0px -5% 0px" });
     revealItems.forEach((item) => revealObserver.observe(item));
-  }
-
-  const timeline = document.querySelector("[data-timeline]");
-  if (timeline) {
-    const showTimeline = () => {
-      timeline.classList.add("is-visible");
-      timeline.style.setProperty("--progress", "100%");
-    };
-    if (reducedMotion || !("IntersectionObserver" in window)) {
-      showTimeline();
-    } else {
-      const timelineObserver = new IntersectionObserver((entries, observer) => {
-        if (entries[0].isIntersecting) {
-          showTimeline();
-          observer.disconnect();
-        }
-      }, { threshold: 0.3 });
-      timelineObserver.observe(timeline);
-    }
-  }
-
-  const countElements = document.querySelectorAll("[data-count]");
-  const animateCount = (element) => {
-    const target = Number(element.dataset.count);
-    const suffix = element.dataset.suffix || "";
-    const duration = 1100;
-    const started = performance.now();
-    const format = new Intl.NumberFormat("en-IN");
-
-    const tick = (now) => {
-      const progress = Math.min((now - started) / duration, 1);
-      const eased = 1 - Math.pow(1 - progress, 3);
-      element.textContent = `${format.format(Math.round(target * eased))}${suffix}`;
-      if (progress < 1) requestAnimationFrame(tick);
-    };
-    requestAnimationFrame(tick);
-  };
-
-  if (reducedMotion || !("IntersectionObserver" in window)) {
-    countElements.forEach((element) => {
-      element.textContent = `${new Intl.NumberFormat("en-IN").format(Number(element.dataset.count))}${element.dataset.suffix || ""}`;
-    });
+    window.setTimeout(() => revealItems.forEach((item) => item.classList.add("is-visible")), 1800);
   } else {
-    const countObserver = new IntersectionObserver((entries, observer) => {
-      entries.forEach((entry) => {
-        if (entry.isIntersecting) {
-          animateCount(entry.target);
-          observer.unobserve(entry.target);
-        }
-      });
-    }, { threshold: 0.65 });
-    countElements.forEach((element) => countObserver.observe(element));
+    revealItems.forEach((item) => item.classList.add("is-visible"));
   }
 
-  const educationSelect = document.querySelector('select[name="education"]');
-  const cards = [...document.querySelectorAll(".eligibility-card")];
-  const educationMap = {
-    "Graduate": 0,
-    "Skilled graduate": 1,
-    "Postgraduate": 2,
-    "Skilled postgraduate": 3
-  };
-
-  educationSelect?.addEventListener("change", () => {
-    const selectedIndex = educationMap[educationSelect.value];
-    cards.forEach((card, index) => {
-      const matches = selectedIndex === undefined || index === selectedIndex;
-      card.hidden = !matches;
-    });
+  document.querySelectorAll("[data-count]").forEach((counter) => {
+    const suffix = counter.dataset.suffix || "";
+    counter.textContent = `${new Intl.NumberFormat("en-IN").format(Number(counter.dataset.count))}${suffix}`;
   });
 
-  const applicationModal = document.querySelector("[data-application-modal]");
+  const modal = document.querySelector("[data-application-modal]");
   const applicationForm = document.querySelector("[data-application-form]");
   const applicationSuccess = document.querySelector("[data-application-success]");
-  const roleInput = document.querySelector("[data-role-input]");
+  const roleInput = applicationForm?.querySelector("[data-role-input]");
   const qualificationInput = applicationForm?.querySelector('select[name="qualification"]');
-  let applicationTrigger = null;
+  let modalTrigger = null;
 
   const openApplication = (trigger, role = "", qualification = "") => {
-    if (!applicationModal) return;
-    applicationTrigger = trigger;
+    if (!modal || !applicationForm || !applicationSuccess) return;
+    modalTrigger = trigger;
     applicationForm.reset();
-    roleInput.value = role;
-    qualificationInput.value = qualification;
-    const previousError = applicationForm.querySelector("[data-form-error]");
-    if (previousError) previousError.hidden = true;
+    if (roleInput) roleInput.value = role;
+    if (qualificationInput) qualificationInput.value = qualification;
+    const formError = applicationForm.querySelector("[data-form-error]");
+    if (formError) formError.hidden = true;
     applicationForm.hidden = false;
     applicationSuccess.hidden = true;
-    applicationModal.hidden = false;
+    modal.hidden = false;
     document.body.classList.add("modal-open");
-    window.requestAnimationFrame(() => applicationModal.classList.add("is-open"));
-    applicationModal.querySelector(role ? 'input[name="fullName"]' : 'select[name="role"]')?.focus();
+    window.requestAnimationFrame(() => modal.classList.add("is-open"));
+    window.setTimeout(() => (role ? applicationForm.querySelector('input[name="fullName"]') : roleInput)?.focus(), 120);
   };
-
   const closeApplication = () => {
-    if (!applicationModal) return;
-    applicationModal.classList.remove("is-open");
+    if (!modal) return;
+    modal.classList.remove("is-open");
     document.body.classList.remove("modal-open");
-    window.setTimeout(() => { applicationModal.hidden = true; }, 220);
-    applicationTrigger?.focus();
+    window.setTimeout(() => { modal.hidden = true; }, 230);
+    modalTrigger?.focus();
   };
 
-  document.querySelectorAll("[data-apply-role]").forEach((button) => {
-    button.addEventListener("click", () => openApplication(button, button.dataset.applyRole));
-  });
-
-  document.querySelectorAll("[data-apply-qualification]").forEach((button) => {
-    button.addEventListener("click", () => {
-      openApplication(button, "", button.dataset.applyQualification);
-    });
-  });
-
-  document.querySelectorAll("[data-open-application]").forEach((button) => {
-    button.addEventListener("click", (event) => {
-      event.preventDefault();
-      openApplication(button);
-    });
-  });
+  document.querySelectorAll("[data-open-application]").forEach((trigger) => trigger.addEventListener("click", (event) => {
+    event.preventDefault();
+    openApplication(trigger);
+  }));
+  document.querySelectorAll("[data-apply-role]").forEach((trigger) => trigger.addEventListener("click", (event) => {
+    event.preventDefault();
+    openApplication(trigger, trigger.dataset.applyRole || "");
+  }));
+  document.querySelectorAll("[data-apply-qualification]").forEach((trigger) => trigger.addEventListener("click", () => {
+    openApplication(trigger, "", trigger.dataset.applyQualification || "");
+  }));
+  document.querySelectorAll("[data-close-application]").forEach((trigger) => trigger.addEventListener("click", closeApplication));
 
   if (new URLSearchParams(window.location.search).get("apply") === "1") {
     openApplication(null);
@@ -327,41 +107,40 @@ document.addEventListener("DOMContentLoaded", () => {
   const enquiryForm = document.querySelector("[data-enquiry-form]");
   enquiryForm?.addEventListener("submit", async (event) => {
     event.preventDefault();
-    const submitButton = enquiryForm.querySelector('button[type="submit"]');
-    const errorMessage = enquiryForm.querySelector("[data-enquiry-error]");
-    const successMessage = enquiryForm.querySelector("[data-enquiry-success]");
-    errorMessage.hidden = true;
-    successMessage.hidden = true;
-    submitButton.disabled = true;
-    submitButton.firstChild.textContent = "Sending… ";
+    const submit = enquiryForm.querySelector('button[type="submit"]');
+    const error = enquiryForm.querySelector("[data-enquiry-error]");
+    const success = enquiryForm.querySelector("[data-enquiry-success]");
+    error.hidden = true;
+    success.hidden = true;
+    submit.disabled = true;
+    const original = submit.innerHTML;
+    submit.textContent = "Sending…";
     try {
-      const fields = Object.fromEntries(new FormData(enquiryForm));
       const response = await fetch("/api/enquiries", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(fields)
+        body: JSON.stringify(Object.fromEntries(new FormData(enquiryForm)))
       });
       const result = await response.json().catch(() => ({}));
       if (!response.ok) throw new Error(result.error || "Unable to send your enquiry. Please try again.");
       enquiryForm.reset();
-      successMessage.textContent = `Thank you. Your enquiry reference is ${result.enquiryId}.`;
-      successMessage.hidden = false;
-      successMessage.focus();
-    } catch (error) {
-      errorMessage.textContent = error.message;
-      errorMessage.hidden = false;
-      errorMessage.focus();
+      success.textContent = `Thank you. Your enquiry reference is ${result.enquiryId}.`;
+      success.hidden = false;
+      success.focus();
+    } catch (requestError) {
+      error.textContent = requestError.message;
+      error.hidden = false;
+      error.focus();
     } finally {
-      submitButton.disabled = false;
-      submitButton.firstChild.textContent = "Send enquiry ";
+      submit.disabled = false;
+      submit.innerHTML = original;
     }
   });
 
-  document.querySelectorAll("[data-close-application]").forEach((button) => button.addEventListener("click", closeApplication));
   applicationForm?.addEventListener("submit", async (event) => {
     event.preventDefault();
-    const submitButton = applicationForm.querySelector('button[type="submit"]');
-    const formError = applicationForm.querySelector("[data-form-error]");
+    const submit = applicationForm.querySelector('button[type="submit"]');
+    const error = applicationForm.querySelector("[data-form-error]");
     const resume = applicationForm.elements.resume?.files?.[0];
     if (resume && resume.size > 5 * 1024 * 1024) {
       applicationForm.elements.resume.setCustomValidity("Please upload a file smaller than 5 MB.");
@@ -369,14 +148,12 @@ document.addEventListener("DOMContentLoaded", () => {
       return;
     }
     applicationForm.elements.resume?.setCustomValidity("");
-    formError.hidden = true;
-    submitButton.disabled = true;
-    submitButton.firstChild.textContent = "Submitting… ";
+    error.hidden = true;
+    submit.disabled = true;
+    const original = submit.innerHTML;
+    submit.textContent = "Submitting…";
     try {
-      const response = await fetch("/api/applications", {
-        method: "POST",
-        body: new FormData(applicationForm)
-      });
+      const response = await fetch("/api/applications", { method: "POST", body: new FormData(applicationForm) });
       const result = await response.json().catch(() => ({}));
       if (!response.ok) throw new Error(result.error || "Unable to submit your application. Please try again.");
       applicationForm.hidden = true;
@@ -385,17 +162,19 @@ document.addEventListener("DOMContentLoaded", () => {
       if (reference) reference.textContent = `Application reference: ${result.applicationId}`;
       applicationSuccess.querySelector("button")?.focus();
       applicationForm.reset();
-    } catch (error) {
-      formError.textContent = error.message;
-      formError.hidden = false;
-      formError.focus();
+    } catch (requestError) {
+      error.textContent = requestError.message;
+      error.hidden = false;
+      error.focus();
     } finally {
-      submitButton.disabled = false;
-      submitButton.firstChild.textContent = "Submit application ";
+      submit.disabled = false;
+      submit.innerHTML = original;
     }
   });
 
   document.addEventListener("keydown", (event) => {
-    if (event.key === "Escape" && applicationModal && !applicationModal.hidden) closeApplication();
+    if (event.key !== "Escape") return;
+    if (modal && !modal.hidden) closeApplication();
+    else if (navPanel?.classList.contains("open")) closeMenu();
   });
 });
