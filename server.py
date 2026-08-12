@@ -106,7 +106,7 @@ def _email_header(value: str, limit: int = 120) -> str:
 def requested_role(fields: dict[str, str]) -> str:
     if fields.get("role") == "Other":
         return fields.get("otherRole", "").strip()
-    return fields.get("role", "").strip()
+    return fields.get("role", "").strip() or "General application"
 
 
 def build_application_emails(application_id: str, fields: dict[str, str], resume, photo):
@@ -115,9 +115,13 @@ def build_application_emails(application_id: str, fields: dict[str, str], resume
     candidate_email = fields["email"].strip()
     candidate_name = _email_header(fields["fullName"])
     role = _email_header(requested_role(fields))
+    has_selected_role = bool(fields.get("role"))
+    subject_detail = role if has_selected_role else _email_header(fields["qualification"])
+    role_line = f"Role: {role}\n" if has_selected_role else ""
+    application_target = f" for {role}" if has_selected_role else ""
 
     admin_message = EmailMessage()
-    admin_message["Subject"] = f"New application: {role} - {candidate_name}"
+    admin_message["Subject"] = f"New application: {subject_detail} - {candidate_name}"
     admin_message["From"] = sender
     admin_message["To"] = admin_email
     admin_message["Reply-To"] = candidate_email
@@ -130,7 +134,7 @@ def build_application_emails(application_id: str, fields: dict[str, str], resume
         f"Location: {fields['location']}\n"
         f"Qualification: {fields['qualification']}\n"
         f"Experience: {fields['experience']}\n"
-        f"Role: {requested_role(fields)}\n\n"
+        f"{role_line}\n"
         f"Candidate message:\n{fields.get('message', '').strip() or 'Not provided'}\n"
     )
     filename, content_type, content = resume
@@ -157,8 +161,8 @@ def build_application_emails(application_id: str, fields: dict[str, str], resume
     candidate_message["Reply-To"] = admin_email
     candidate_message.set_content(
         f"Hello {fields['fullName']},\n\n"
-        "Thank you for applying through AION Technology. We have received your application "
-        f"for {requested_role(fields)}.\n\n"
+        "Thank you for applying through AION Technology. We have received your application"
+        f"{application_target}.\n\n"
         f"Application reference: {application_id}\n\n"
         "Our team will review your profile and contact you with the next steps.\n\n"
         "AION Technology\n"
@@ -470,18 +474,19 @@ class ApplicationHandler(SimpleHTTPRequestHandler):
 
     @staticmethod
     def validate(fields, resume, photo) -> str | None:
-        required = ("role", "fullName", "email", "phone", "location", "qualification", "experience")
+        required = ("fullName", "email", "phone", "location", "qualification", "experience")
         if any(not fields.get(name) for name in required):
             return "Please complete all required fields."
         if fields.get("consent") != "on":
             return "Consent is required to submit an application."
         if fields["qualification"] not in QUALIFICATIONS or fields["experience"] not in EXPERIENCE_LEVELS:
             return "Please select valid qualification and experience values."
-        if fields["role"] not in ROLES:
+        role = fields.get("role", "")
+        if role and role not in ROLES:
             return "Please select a valid open role."
-        if fields["role"] not in ROLES_BY_QUALIFICATION[fields["qualification"]]:
+        if role and role not in ROLES_BY_QUALIFICATION[fields["qualification"]]:
             return "Please select a role related to your qualification."
-        if fields["role"] == "Other" and not fields.get("otherRole", "").strip():
+        if role == "Other" and not fields.get("otherRole", "").strip():
             return "Please enter the role you are looking for."
         if len(fields.get("otherRole", "")) > 100:
             return "The requested role must be 100 characters or fewer."

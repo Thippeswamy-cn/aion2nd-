@@ -59,57 +59,14 @@ document.addEventListener("DOMContentLoaded", () => {
   const modal = document.querySelector("[data-application-modal]");
   const applicationForm = document.querySelector("[data-application-form]");
   const applicationSuccess = document.querySelector("[data-application-success]");
-  const roleInput = applicationForm?.querySelector("[data-role-input]");
   const qualificationInput = applicationForm?.querySelector('select[name="qualification"]');
-  const otherRoleField = applicationForm?.querySelector("[data-other-role-field]");
-  const otherRoleInput = applicationForm?.querySelector("[data-other-role-input]");
-  const rolesByQualification = {
-    "Graduate": ["Branch Operations Executive", "Customer Success Associate", "Business Development Associate", "Other"],
-    "Skilled graduate": ["Software Engineer", "Data Analyst", "Healthcare Administration Associate", "Customer Success Associate", "Quality Assurance Executive", "Other"],
-    "Postgraduate": ["Data Analyst", "Branch Operations Executive", "Customer Success Associate", "Business Development Associate", "Other"],
-    "Skilled postgraduate": ["Software Engineer", "Data Analyst", "Branch Operations Executive", "Customer Success Associate", "Quality Assurance Executive", "Business Development Associate", "Other"],
-    "Diploma / Other": ["Customer Success Associate", "Quality Assurance Executive", "Other"]
-  };
-  const roleGroups = roleInput ? [...roleInput.querySelectorAll("optgroup")].map((group) => ({
-    label: group.label,
-    roles: [...group.querySelectorAll("option")].map((option) => option.value)
-  })) : [];
   let modalTrigger = null;
 
-  const syncOtherRoleField = (focus = false) => {
-    const show = roleInput?.value === "Other";
-    if (otherRoleField) otherRoleField.hidden = !show;
-    if (otherRoleInput) {
-      otherRoleInput.disabled = !show;
-      otherRoleInput.required = show;
-      if (!show) otherRoleInput.value = "";
-      if (show && focus) otherRoleInput.focus();
-    }
-  };
-
-  const setRoleOptions = (qualification = "", preferredRole = "") => {
-    if (!roleInput) return;
-    const allowedRoles = qualification ? new Set(rolesByQualification[qualification] || ["Other"]) : null;
-    roleInput.replaceChildren(new Option("Select a role", ""));
-    roleGroups.forEach((group) => {
-      const roles = allowedRoles ? group.roles.filter((role) => allowedRoles.has(role)) : group.roles;
-      if (!roles.length) return;
-      const optgroup = document.createElement("optgroup");
-      optgroup.label = group.label;
-      roles.forEach((role) => optgroup.append(new Option(role, role)));
-      roleInput.append(optgroup);
-    });
-    roleInput.value = preferredRole;
-    if (roleInput.value !== preferredRole) roleInput.value = "";
-    syncOtherRoleField();
-  };
-
-  const openApplication = (trigger, role = "", qualification = "") => {
+  const openApplication = (trigger, qualification = "") => {
     if (!modal || !applicationForm || !applicationSuccess) return;
     modalTrigger = trigger;
     applicationForm.reset();
     if (qualificationInput) qualificationInput.value = qualification;
-    setRoleOptions(qualification, role);
     const formError = applicationForm.querySelector("[data-form-error]");
     if (formError) formError.hidden = true;
     applicationForm.hidden = false;
@@ -117,7 +74,7 @@ document.addEventListener("DOMContentLoaded", () => {
     modal.hidden = false;
     document.body.classList.add("modal-open");
     window.requestAnimationFrame(() => modal.classList.add("is-open"));
-    window.setTimeout(() => (role ? applicationForm.querySelector('input[name="fullName"]') : roleInput)?.focus(), 120);
+    window.setTimeout(() => (qualification ? applicationForm.querySelector('input[name="fullName"]') : qualificationInput)?.focus(), 120);
   };
   const closeApplication = () => {
     if (!modal) return;
@@ -133,15 +90,11 @@ document.addEventListener("DOMContentLoaded", () => {
   }));
   document.querySelectorAll("[data-apply-role]").forEach((trigger) => trigger.addEventListener("click", (event) => {
     event.preventDefault();
-    openApplication(trigger, trigger.dataset.applyRole || "");
+    openApplication(trigger);
   }));
   document.querySelectorAll("[data-apply-qualification]").forEach((trigger) => trigger.addEventListener("click", () => {
-    openApplication(trigger, "", trigger.dataset.applyQualification || "");
+    openApplication(trigger, trigger.dataset.applyQualification || "");
   }));
-  qualificationInput?.addEventListener("change", () => {
-    setRoleOptions(qualificationInput.value, roleInput?.value || "");
-  });
-  roleInput?.addEventListener("change", () => syncOtherRoleField(true));
   document.querySelectorAll("[data-close-application]").forEach((trigger) => trigger.addEventListener("click", closeApplication));
 
   if (new URLSearchParams(window.location.search).get("apply") === "1") {
@@ -214,7 +167,6 @@ document.addEventListener("DOMContentLoaded", () => {
       if (reference) reference.textContent = `Application reference: ${result.applicationId}`;
       applicationSuccess.querySelector("button")?.focus();
       applicationForm.reset();
-      syncOtherRoleField();
     } catch (requestError) {
       error.textContent = requestError.message;
       error.hidden = false;

@@ -2,7 +2,7 @@ import os
 import unittest
 from unittest.mock import patch
 
-from server import email_notifications_configured, send_application_emails
+from server import build_application_emails, email_notifications_configured, send_application_emails
 
 
 class ApplicationEmailTests(unittest.TestCase):
@@ -34,6 +34,17 @@ class ApplicationEmailTests(unittest.TestCase):
             self.assertTrue(email_notifications_configured())
             os.environ["SMTP_PASSWORD"] = ""
             self.assertFalse(email_notifications_configured())
+
+    def test_general_application_email_does_not_reference_a_missing_role(self):
+        fields = {key: value for key, value in self.fields.items() if key != "role"}
+        with patch.dict(os.environ, self.settings, clear=False):
+            admin_message, candidate_message = build_application_emails(
+                "AION-TEST-002", fields, self.resume, self.photo
+            )
+
+        self.assertIn("Graduate", str(admin_message["Subject"]))
+        self.assertIn("received your application.", candidate_message.get_content())
+        self.assertNotIn("General application", candidate_message.get_content())
 
     @patch("server.smtplib.SMTP")
     def test_sends_admin_notification_and_candidate_confirmation(self, smtp):

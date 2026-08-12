@@ -51,6 +51,10 @@ class ApplicationRoleValidationTests(unittest.TestCase):
             "Please enter the role you are looking for.",
         )
 
+    def test_general_application_does_not_require_a_role(self):
+        fields = {key: value for key, value in self.fields.items() if key != "role"}
+        self.assertIsNone(ApplicationHandler.validate(fields, self.resume, self.photo))
+
 
 if __name__ == "__main__":
     unittest.main()
