@@ -271,7 +271,11 @@ form input::placeholder,form textarea::placeholder { color: rgba(255,255,255,.28
 
 .education-field { min-width: 0; margin-bottom: 18px; }
 .education-label { display: block; margin-bottom: 8px; color: rgba(255,255,255,.62); font-size: 12px; font-weight: 700; }
-.education-select { position: relative; }
+.education-select { position: relative; --education-select-ready: 1; }
+.education-native-select { min-height: 48px; color-scheme: dark; }
+.education-native-select option,.education-native-select optgroup { color: #fff; background: #0a0d1b; }
+.education-select.is-enhanced .education-native-select { display: none; }
+.education-trigger[hidden] { display: none; }
 .education-trigger { width: 100%; min-height: 48px; display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 13px 15px; border: 1px solid rgba(255,255,255,.13); border-radius: 8px; outline: 0; color: rgba(255,255,255,.58); background: rgba(5,7,16,.5); font-weight: 600; text-align: left; cursor: pointer; transition: border-color .2s ease, background .2s ease, box-shadow .2s ease; }
 .education-trigger:hover { border-color: rgba(255,255,255,.24); background: rgba(5,7,16,.66); }
 .education-trigger:focus-visible,.education-select.is-open .education-trigger { border-color: rgba(244,39,168,.72); background: rgba(5,7,16,.78); box-shadow: 0 0 0 4px rgba(244,39,168,.1); }

@@ -11,8 +11,8 @@
   <link rel="preload" as="image" href="assets/images/industries/technology.jpg" fetchpriority="high">
   <link rel="preload" as="image" href="assets/images/aion-logo.webp">
   <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="assets/css/styles.css?v=30">
-  <script defer src="assets/js/script.js?v=27"></script>
+  <link rel="stylesheet" href="assets/css/styles.css?v=31">
+  <script defer src="assets/js/script.js?v=28"></script>
 </head>
 <body id="top">
   <a class="skip-link" href="#main">Skip to content</a>
@@ -222,16 +222,16 @@
       <form class="application-form" data-application-form novalidate>
         <div class="form-grid">
           <div class="education-field form-span-2" data-education-field>
-            <span class="education-label" id="education-label">Highest degree or qualification</span>
+            <label class="education-label" id="education-label" for="education-native">Highest degree or qualification</label>
             <div class="education-select" data-education-select>
-              <select name="qualification" data-education-input hidden>
+              <select class="education-native-select" id="education-native" name="qualification" data-education-input required>
                 <option value="">Select your highest qualification</option>
                 <optgroup label="Undergraduate degrees"><option>BCA</option><option>BSc</option><option>BE</option><option>BTech</option><option>BA</option><option>BCom</option><option>BBA</option><option>BPharm</option><option>BEd</option><option>LLB</option><option>MBBS</option><option>BDS</option><option>BSc Nursing</option></optgroup>
                 <optgroup label="Postgraduate degrees"><option>MA</option><option>MCom</option><option>MSc</option><option>MBA</option><option>MCA</option><option>ME</option><option>MTech</option><option>MPharm</option><option>MEd</option><option>LLM</option></optgroup>
                 <optgroup label="School and diploma"><option>10th / SSLC</option><option>12th / PUC</option><option>ITI</option><option>Diploma</option></optgroup>
                 <optgroup label="Doctorate and other"><option>PhD</option><option>Other</option></optgroup>
               </select>
-              <button class="education-trigger" id="education-trigger" type="button" role="combobox" aria-labelledby="education-label education-value" aria-controls="education-options" aria-expanded="false" aria-haspopup="listbox" aria-describedby="education-error" data-education-trigger><span id="education-value" data-education-value>Select your highest qualification</span><span class="education-chevron" aria-hidden="true"></span></button>
+              <button class="education-trigger" id="education-trigger" type="button" role="combobox" aria-labelledby="education-label education-value" aria-controls="education-options" aria-expanded="false" aria-haspopup="listbox" aria-describedby="education-error" data-education-trigger hidden><span id="education-value" data-education-value>Select your highest qualification</span><span class="education-chevron" aria-hidden="true"></span></button>
               <div class="education-options" id="education-options" role="listbox" aria-labelledby="education-label" data-education-options hidden></div>
             </div>
             <small class="education-error" id="education-error" data-education-error hidden>Please select your highest degree or qualification.</small>

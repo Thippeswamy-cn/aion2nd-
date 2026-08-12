@@ -60,6 +60,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const applicationForm = document.querySelector("[data-application-form]");
   const applicationSuccess = document.querySelector("[data-application-success]");
   const educationField = applicationForm?.querySelector("[data-education-field]");
+  const educationLabel = applicationForm?.querySelector("#education-label");
   const educationSelect = applicationForm?.querySelector("[data-education-select]");
   const qualificationInput = applicationForm?.querySelector("[data-education-input]");
   const educationTrigger = applicationForm?.querySelector("[data-education-trigger]");
@@ -68,10 +69,11 @@ document.addEventListener("DOMContentLoaded", () => {
   const educationError = applicationForm?.querySelector("[data-education-error]");
   const educationOptionButtons = [];
   const educationPlaceholder = qualificationInput?.options[0]?.textContent || "Select your highest qualification";
+  let educationEnhanced = false;
   let modalTrigger = null;
 
   const closeEducationOptions = () => {
-    if (!educationSelect || !educationTrigger || !educationOptions) return;
+    if (!educationEnhanced || !educationSelect || !educationTrigger || !educationOptions) return;
     educationSelect.classList.remove("is-open");
     educationTrigger.setAttribute("aria-expanded", "false");
     educationOptions.hidden = true;
@@ -80,6 +82,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const syncEducationValue = (value = "") => {
     if (!qualificationInput || !educationValue || !educationTrigger) return;
     qualificationInput.value = value;
+    qualificationInput.setCustomValidity("");
     const selected = [...qualificationInput.options].find((option) => option.value === qualificationInput.value && option.value);
     educationValue.textContent = selected?.textContent || educationPlaceholder;
     educationTrigger.classList.toggle("has-value", Boolean(selected));
@@ -90,7 +93,7 @@ document.addEventListener("DOMContentLoaded", () => {
   };
 
   const openEducationOptions = (focusPosition = "") => {
-    if (!educationSelect || !educationTrigger || !educationOptions || !educationOptionButtons.length) return;
+    if (!educationEnhanced || !educationSelect || !educationTrigger || !educationOptions || !educationOptionButtons.length) return;
     educationOptions.hidden = false;
     educationSelect.classList.add("is-open");
     educationTrigger.setAttribute("aria-expanded", "true");
@@ -137,8 +140,22 @@ document.addEventListener("DOMContentLoaded", () => {
         addEducationOption(item, educationOptions);
       }
     });
+    const customStylesReady = getComputedStyle(educationSelect).getPropertyValue("--education-select-ready").trim() === "1";
+    if (customStylesReady && educationTrigger) {
+      educationEnhanced = true;
+      educationSelect.classList.add("is-enhanced");
+      qualificationInput.hidden = true;
+      educationTrigger.hidden = false;
+    }
     syncEducationValue();
   }
+
+  qualificationInput?.addEventListener("change", () => syncEducationValue(qualificationInput.value));
+  educationLabel?.addEventListener("click", (event) => {
+    if (!educationEnhanced) return;
+    event.preventDefault();
+    educationTrigger?.focus();
+  });
 
   educationTrigger?.addEventListener("click", () => {
     if (educationSelect?.classList.contains("is-open")) closeEducationOptions();
@@ -188,7 +205,10 @@ document.addEventListener("DOMContentLoaded", () => {
     modal.hidden = false;
     document.body.classList.add("modal-open");
     window.requestAnimationFrame(() => modal.classList.add("is-open"));
-    window.setTimeout(() => (qualificationInput?.value ? applicationForm.querySelector('input[name="fullName"]') : educationTrigger)?.focus(), 120);
+    window.setTimeout(() => {
+      const educationControl = educationEnhanced ? educationTrigger : qualificationInput;
+      (qualificationInput?.value ? applicationForm.querySelector('input[name="fullName"]') : educationControl)?.focus();
+    }, 120);
   };
   const closeApplication = () => {
     if (!modal) return;
@@ -257,13 +277,20 @@ document.addEventListener("DOMContentLoaded", () => {
     const resume = applicationForm.elements.resume?.files?.[0];
     const photo = applicationForm.elements.photo?.files?.[0];
     if (!qualificationInput?.value) {
-      educationField?.classList.add("is-invalid");
-      educationTrigger?.setAttribute("aria-invalid", "true");
-      if (educationError) educationError.hidden = false;
-      openEducationOptions();
-      educationTrigger?.focus();
+      if (educationEnhanced) {
+        educationField?.classList.add("is-invalid");
+        educationTrigger?.setAttribute("aria-invalid", "true");
+        if (educationError) educationError.hidden = false;
+        openEducationOptions();
+        educationTrigger?.focus();
+      } else {
+        qualificationInput?.setCustomValidity("Please select your highest degree or qualification.");
+        qualificationInput?.reportValidity();
+        qualificationInput?.focus();
+      }
       return;
     }
+    qualificationInput.setCustomValidity("");
     if (!applicationForm.reportValidity()) return;
     if (resume && resume.size > 5 * 1024 * 1024) {
       applicationForm.elements.resume.setCustomValidity("Please upload a file smaller than 5 MB.");
