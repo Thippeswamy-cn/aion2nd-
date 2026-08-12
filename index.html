@@ -218,10 +218,24 @@
     <div class="modal-backdrop" data-close-application></div>
     <section class="application-dialog" role="dialog" aria-modal="true" aria-labelledby="application-title">
       <button class="modal-close" type="button" aria-label="Close application form" data-close-application>×</button>
-      <div class="application-intro"><p class="kicker">Job application</p><h2 id="application-title">Take the next step.</h2><p>Tell us your highest level of education, complete your details and upload your photo and résumé. No payment is required now; a ₹500 fee applies only after eligibility and review.</p></div>
-      <form class="application-form" data-application-form>
+      <div class="application-intro"><p class="kicker">Job application</p><h2 id="application-title">Take the next step.</h2><p>Tell us your highest degree or qualification, complete your details and upload your photo and résumé. No payment is required now; a ₹500 fee applies only after eligibility and review.</p></div>
+      <form class="application-form" data-application-form novalidate>
         <div class="form-grid">
-          <label class="form-span-2">Highest level of education<select name="qualification" required><option value="">Select your highest level</option><option>Graduate</option><option>Skilled graduate</option><option>Postgraduate</option><option>Skilled postgraduate</option><option>Diploma / Other</option></select></label>
+          <div class="education-field form-span-2" data-education-field>
+            <span class="education-label" id="education-label">Highest degree or qualification</span>
+            <div class="education-select" data-education-select>
+              <select name="qualification" data-education-input hidden>
+                <option value="">Select your highest qualification</option>
+                <optgroup label="Undergraduate degrees"><option>BCA</option><option>BSc</option><option>BE</option><option>BTech</option><option>BA</option><option>BCom</option><option>BBA</option><option>BPharm</option><option>BEd</option><option>LLB</option><option>MBBS</option><option>BDS</option><option>BSc Nursing</option></optgroup>
+                <optgroup label="Postgraduate degrees"><option>MA</option><option>MCom</option><option>MSc</option><option>MBA</option><option>MCA</option><option>ME</option><option>MTech</option><option>MPharm</option><option>MEd</option><option>LLM</option></optgroup>
+                <optgroup label="School and diploma"><option>10th / SSLC</option><option>12th / PUC</option><option>ITI</option><option>Diploma</option></optgroup>
+                <optgroup label="Doctorate and other"><option>PhD</option><option>Other</option></optgroup>
+              </select>
+              <button class="education-trigger" id="education-trigger" type="button" role="combobox" aria-labelledby="education-label education-value" aria-controls="education-options" aria-expanded="false" aria-haspopup="listbox" aria-describedby="education-error" data-education-trigger><span id="education-value" data-education-value>Select your highest qualification</span><span class="education-chevron" aria-hidden="true"></span></button>
+              <div class="education-options" id="education-options" role="listbox" aria-labelledby="education-label" data-education-options hidden></div>
+            </div>
+            <small class="education-error" id="education-error" data-education-error hidden>Please select your highest degree or qualification.</small>
+          </div>
           <label>Full name<input type="text" name="fullName" autocomplete="name" placeholder="Your full name" required></label>
           <label>Email address<input type="email" name="email" autocomplete="email" placeholder="you@example.com" required></label>
           <label>Phone number<input type="tel" name="phone" autocomplete="tel" placeholder="+91 80503 50011" pattern="[0-9+() -]{10,18}" required></label>

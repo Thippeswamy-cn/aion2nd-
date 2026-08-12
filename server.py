@@ -86,9 +86,21 @@ ROLES_BY_QUALIFICATION = {
         "Customer Success Associate", "Quality Assurance Executive", "Other",
     },
 }
-QUALIFICATIONS = set(ROLES_BY_QUALIFICATION)
+DEGREES_BY_CATEGORY = {
+    "Graduate": {"BA", "BCom", "BBA", "BSc", "BEd", "LLB"},
+    "Skilled graduate": {"BCA", "BE", "BTech", "BPharm", "MBBS", "BDS", "BSc Nursing"},
+    "Postgraduate": {"MA", "MCom", "MSc", "MEd", "LLM"},
+    "Skilled postgraduate": {"MBA", "MCA", "ME", "MTech", "MPharm", "PhD"},
+    "Diploma / Other": {"10th / SSLC", "12th / PUC", "ITI", "Diploma", "Other"},
+}
+DEGREE_CATEGORIES = {
+    degree: category
+    for category, degrees in DEGREES_BY_CATEGORY.items()
+    for degree in degrees
+}
+QUALIFICATIONS = set(ROLES_BY_QUALIFICATION) | set(DEGREE_CATEGORIES)
 ROLES = set().union(*ROLES_BY_QUALIFICATION.values())
-ENQUIRY_CATEGORIES = QUALIFICATIONS | {"Employer / recruiter", "Not sure"}
+ENQUIRY_CATEGORIES = set(ROLES_BY_QUALIFICATION) | {"Employer / recruiter", "Not sure"}
 EXPERIENCE_LEVELS = {
     "Fresher", "Less than 1 year", "1–3 years", "3–5 years", "5+ years",
 }
@@ -484,7 +496,8 @@ class ApplicationHandler(SimpleHTTPRequestHandler):
         role = fields.get("role", "")
         if role and role not in ROLES:
             return "Please select a valid open role."
-        if role and role not in ROLES_BY_QUALIFICATION[fields["qualification"]]:
+        qualification_category = DEGREE_CATEGORIES.get(fields["qualification"], fields["qualification"])
+        if role and role not in ROLES_BY_QUALIFICATION[qualification_category]:
             return "Please select a role related to your qualification."
         if role == "Other" and not fields.get("otherRole", "").strip():
             return "Please enter the role you are looking for."

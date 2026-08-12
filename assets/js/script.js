@@ -59,14 +59,128 @@ document.addEventListener("DOMContentLoaded", () => {
   const modal = document.querySelector("[data-application-modal]");
   const applicationForm = document.querySelector("[data-application-form]");
   const applicationSuccess = document.querySelector("[data-application-success]");
-  const qualificationInput = applicationForm?.querySelector('select[name="qualification"]');
+  const educationField = applicationForm?.querySelector("[data-education-field]");
+  const educationSelect = applicationForm?.querySelector("[data-education-select]");
+  const qualificationInput = applicationForm?.querySelector("[data-education-input]");
+  const educationTrigger = applicationForm?.querySelector("[data-education-trigger]");
+  const educationValue = applicationForm?.querySelector("[data-education-value]");
+  const educationOptions = applicationForm?.querySelector("[data-education-options]");
+  const educationError = applicationForm?.querySelector("[data-education-error]");
+  const educationOptionButtons = [];
+  const educationPlaceholder = qualificationInput?.options[0]?.textContent || "Select your highest qualification";
   let modalTrigger = null;
+
+  const closeEducationOptions = () => {
+    if (!educationSelect || !educationTrigger || !educationOptions) return;
+    educationSelect.classList.remove("is-open");
+    educationTrigger.setAttribute("aria-expanded", "false");
+    educationOptions.hidden = true;
+  };
+
+  const syncEducationValue = (value = "") => {
+    if (!qualificationInput || !educationValue || !educationTrigger) return;
+    qualificationInput.value = value;
+    const selected = [...qualificationInput.options].find((option) => option.value === qualificationInput.value && option.value);
+    educationValue.textContent = selected?.textContent || educationPlaceholder;
+    educationTrigger.classList.toggle("has-value", Boolean(selected));
+    educationTrigger.setAttribute("aria-invalid", "false");
+    educationField?.classList.remove("is-invalid");
+    if (educationError) educationError.hidden = true;
+    educationOptionButtons.forEach((option) => option.setAttribute("aria-selected", String(option.dataset.value === qualificationInput.value)));
+  };
+
+  const openEducationOptions = (focusPosition = "") => {
+    if (!educationSelect || !educationTrigger || !educationOptions || !educationOptionButtons.length) return;
+    educationOptions.hidden = false;
+    educationSelect.classList.add("is-open");
+    educationTrigger.setAttribute("aria-expanded", "true");
+    if (!focusPosition) return;
+    const selected = educationOptionButtons.find((option) => option.getAttribute("aria-selected") === "true");
+    const target = focusPosition === "last" ? educationOptionButtons.at(-1) : selected || educationOptionButtons[0];
+    target?.focus();
+    target?.scrollIntoView({ block: "nearest" });
+  };
+
+  const chooseEducation = (value, restoreFocus = true) => {
+    syncEducationValue(value);
+    closeEducationOptions();
+    if (restoreFocus) educationTrigger?.focus();
+  };
+
+  if (qualificationInput && educationOptions) {
+    const addEducationOption = (option, container) => {
+      const choice = document.createElement("button");
+      choice.type = "button";
+      choice.className = "education-option";
+      choice.dataset.value = option.value;
+      choice.setAttribute("role", "option");
+      choice.setAttribute("aria-selected", "false");
+      choice.tabIndex = -1;
+      choice.textContent = option.textContent;
+      container.append(choice);
+      educationOptionButtons.push(choice);
+    };
+    [...qualificationInput.children].forEach((item) => {
+      if (item.tagName === "OPTGROUP") {
+        const group = document.createElement("div");
+        group.className = "education-option-group";
+        group.setAttribute("role", "group");
+        group.setAttribute("aria-label", item.label);
+        const groupLabel = document.createElement("div");
+        groupLabel.className = "education-group-label";
+        groupLabel.setAttribute("aria-hidden", "true");
+        groupLabel.textContent = item.label;
+        group.append(groupLabel);
+        [...item.querySelectorAll("option")].forEach((option) => addEducationOption(option, group));
+        educationOptions.append(group);
+      } else if (item.value) {
+        addEducationOption(item, educationOptions);
+      }
+    });
+    syncEducationValue();
+  }
+
+  educationTrigger?.addEventListener("click", () => {
+    if (educationSelect?.classList.contains("is-open")) closeEducationOptions();
+    else openEducationOptions();
+  });
+  educationTrigger?.addEventListener("keydown", (event) => {
+    if (event.key === "ArrowDown" || event.key === "ArrowUp") {
+      event.preventDefault();
+      openEducationOptions(event.key === "ArrowUp" ? "last" : "selected");
+    } else if (event.key === "Escape") {
+      event.stopPropagation();
+      closeEducationOptions();
+    }
+  });
+  educationOptionButtons.forEach((option, index) => {
+    option.addEventListener("click", () => chooseEducation(option.dataset.value || ""));
+    option.addEventListener("keydown", (event) => {
+      if (["ArrowDown", "ArrowUp", "Home", "End"].includes(event.key)) {
+        event.preventDefault();
+        let nextIndex = event.key === "Home" ? 0 : event.key === "End" ? educationOptionButtons.length - 1 : index + (event.key === "ArrowDown" ? 1 : -1);
+        nextIndex = (nextIndex + educationOptionButtons.length) % educationOptionButtons.length;
+        educationOptionButtons[nextIndex]?.focus();
+        educationOptionButtons[nextIndex]?.scrollIntoView({ block: "nearest" });
+      } else if (event.key === "Escape") {
+        event.preventDefault();
+        event.stopPropagation();
+        closeEducationOptions();
+        educationTrigger?.focus();
+      } else if (event.key === "Tab") {
+        closeEducationOptions();
+      }
+    });
+  });
+  document.addEventListener("pointerdown", (event) => {
+    if (educationSelect && !educationSelect.contains(event.target)) closeEducationOptions();
+  });
 
   const openApplication = (trigger, qualification = "") => {
     if (!modal || !applicationForm || !applicationSuccess) return;
     modalTrigger = trigger;
     applicationForm.reset();
-    if (qualificationInput) qualificationInput.value = qualification;
+    syncEducationValue(qualification);
     const formError = applicationForm.querySelector("[data-form-error]");
     if (formError) formError.hidden = true;
     applicationForm.hidden = false;
@@ -74,10 +188,11 @@ document.addEventListener("DOMContentLoaded", () => {
     modal.hidden = false;
     document.body.classList.add("modal-open");
     window.requestAnimationFrame(() => modal.classList.add("is-open"));
-    window.setTimeout(() => (qualification ? applicationForm.querySelector('input[name="fullName"]') : qualificationInput)?.focus(), 120);
+    window.setTimeout(() => (qualificationInput?.value ? applicationForm.querySelector('input[name="fullName"]') : educationTrigger)?.focus(), 120);
   };
   const closeApplication = () => {
     if (!modal) return;
+    closeEducationOptions();
     modal.classList.remove("is-open");
     document.body.classList.remove("modal-open");
     window.setTimeout(() => { modal.hidden = true; }, 230);
@@ -141,6 +256,15 @@ document.addEventListener("DOMContentLoaded", () => {
     const error = applicationForm.querySelector("[data-form-error]");
     const resume = applicationForm.elements.resume?.files?.[0];
     const photo = applicationForm.elements.photo?.files?.[0];
+    if (!qualificationInput?.value) {
+      educationField?.classList.add("is-invalid");
+      educationTrigger?.setAttribute("aria-invalid", "true");
+      if (educationError) educationError.hidden = false;
+      openEducationOptions();
+      educationTrigger?.focus();
+      return;
+    }
+    if (!applicationForm.reportValidity()) return;
     if (resume && resume.size > 5 * 1024 * 1024) {
       applicationForm.elements.resume.setCustomValidity("Please upload a file smaller than 5 MB.");
       applicationForm.reportValidity();
@@ -167,6 +291,7 @@ document.addEventListener("DOMContentLoaded", () => {
       if (reference) reference.textContent = `Application reference: ${result.applicationId}`;
       applicationSuccess.querySelector("button")?.focus();
       applicationForm.reset();
+      syncEducationValue();
     } catch (requestError) {
       error.textContent = requestError.message;
       error.hidden = false;
@@ -179,7 +304,10 @@ document.addEventListener("DOMContentLoaded", () => {
 
   document.addEventListener("keydown", (event) => {
     if (event.key !== "Escape") return;
-    if (modal && !modal.hidden) closeApplication();
+    if (educationSelect?.classList.contains("is-open")) {
+      closeEducationOptions();
+      educationTrigger?.focus();
+    } else if (modal && !modal.hidden) closeApplication();
     else if (navPanel?.classList.contains("open")) closeMenu();
   });
 });

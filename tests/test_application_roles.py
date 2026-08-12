@@ -55,6 +55,20 @@ class ApplicationRoleValidationTests(unittest.TestCase):
         fields = {key: value for key, value in self.fields.items() if key != "role"}
         self.assertIsNone(ApplicationHandler.validate(fields, self.resume, self.photo))
 
+    def test_degree_qualification_is_accepted(self):
+        fields = {
+            **{key: value for key, value in self.fields.items() if key != "role"},
+            "qualification": "BTech",
+        }
+        self.assertIsNone(ApplicationHandler.validate(fields, self.resume, self.photo))
+
+    def test_degree_uses_its_related_role_category(self):
+        self.assertIsNone(self.validate("BTech", "Software Engineer"))
+        self.assertEqual(
+            self.validate("BTech", "Branch Operations Executive"),
+            "Please select a role related to your qualification.",
+        )
+
 
 if __name__ == "__main__":
     unittest.main()

@@ -269,6 +269,31 @@ form input:not([type="checkbox"]):focus,form select:focus,form textarea:focus { 
 form input::placeholder,form textarea::placeholder { color: rgba(255,255,255,.28); }
 .form-message { padding: 12px 14px; border-radius: 8px; font-size: 13px; }.form-error { color: #ffc7c0; background: rgba(255,78,53,.12); }.form-success { color: #bff5dc; background: rgba(35,198,126,.12); }
 
+.education-field { min-width: 0; margin-bottom: 18px; }
+.education-label { display: block; margin-bottom: 8px; color: rgba(255,255,255,.62); font-size: 12px; font-weight: 700; }
+.education-select { position: relative; }
+.education-trigger { width: 100%; min-height: 48px; display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 13px 15px; border: 1px solid rgba(255,255,255,.13); border-radius: 8px; outline: 0; color: rgba(255,255,255,.58); background: rgba(5,7,16,.5); font-weight: 600; text-align: left; cursor: pointer; transition: border-color .2s ease, background .2s ease, box-shadow .2s ease; }
+.education-trigger:hover { border-color: rgba(255,255,255,.24); background: rgba(5,7,16,.66); }
+.education-trigger:focus-visible,.education-select.is-open .education-trigger { border-color: rgba(244,39,168,.72); background: rgba(5,7,16,.78); box-shadow: 0 0 0 4px rgba(244,39,168,.1); }
+.education-trigger.has-value { color: #fff; }
+.education-chevron { width: 9px; height: 9px; flex: none; margin: -4px 2px 0 0; border-right: 2px solid currentColor; border-bottom: 2px solid currentColor; transform: rotate(45deg); transition: transform .2s ease, margin .2s ease; }
+.education-select.is-open .education-chevron { margin: 4px 2px 0 0; transform: rotate(225deg); }
+.education-options { position: absolute; z-index: 30; top: calc(100% + 8px); right: 0; left: 0; max-height: 240px; overflow-y: auto; padding: 6px; border: 1px solid rgba(255,255,255,.14); border-radius: 10px; background: #0a0d1b; box-shadow: 0 22px 60px rgba(0,0,0,.5),0 0 0 1px rgba(244,39,168,.08); overscroll-behavior: contain; scrollbar-color: rgba(244,39,168,.72) rgba(255,255,255,.05); scrollbar-width: thin; }
+.education-options[hidden] { display: none; }
+.education-options::-webkit-scrollbar { width: 8px; }
+.education-options::-webkit-scrollbar-track { margin: 6px 0; border-radius: 999px; background: rgba(255,255,255,.05); }
+.education-options::-webkit-scrollbar-thumb { border: 2px solid #0a0d1b; border-radius: 999px; background: linear-gradient(var(--pink),var(--orange)); }
+.education-option-group { padding: 3px 0; }
+.education-option-group + .education-option-group { margin-top: 4px; padding-top: 8px; border-top: 1px solid rgba(255,255,255,.08); }
+.education-group-label { padding: 5px 12px 4px; color: var(--orange); font-size: 9px; font-weight: 800; letter-spacing: .12em; text-transform: uppercase; }
+.education-option { width: 100%; min-height: 40px; display: flex; align-items: center; justify-content: space-between; gap: 14px; padding: 10px 12px; border: 0; border-radius: 7px; outline: 0; color: rgba(255,255,255,.72); background: transparent; font-weight: 600; text-align: left; cursor: pointer; }
+.education-option:hover,.education-option:focus-visible { color: #fff; background: rgba(255,255,255,.07); }
+.education-option[aria-selected="true"] { color: #fff; background: linear-gradient(90deg,rgba(244,39,168,.19),rgba(255,157,23,.08)); }
+.education-option[aria-selected="true"]::after { content: "\2713"; color: var(--orange); font-size: 14px; }
+.education-field.is-invalid .education-trigger { border-color: #ff7663; box-shadow: 0 0 0 4px rgba(255,78,53,.1); }
+.education-error { display: block; margin-top: 7px; color: #ffc7c0; font-size: 11px; font-weight: 600; }
+.education-error[hidden] { display: none; }
+
 .final-cta { position: relative; overflow: hidden; color: #fff; background: var(--ink-2); border-top: 1px solid var(--line-dark); }
 .final-cta::before { content: ""; position: absolute; inset: 0 auto 0 0; width: 4px; background: var(--brand-gradient); }
 .final-cta-inner { position: relative; min-height: 345px; display: flex; align-items: center; justify-content: space-between; gap: 60px; }
