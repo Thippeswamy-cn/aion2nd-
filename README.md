@@ -1,44 +1,30 @@
-# AION
+# AION Tech Career
 
-Single-page landing website for Aion Career.
-
-## Project structure
-
-```text
-index.html
-assets/
-  css/styles.css
-  images/
-  js/script.js
-  videos/splash-video.mp4
-```
+Landing website and application API for AION Technology. Python 3.10 or newer
+is required.
 
 ## Run locally
-
-Python 3.10 or newer is required. Start the website and application API together:
 
 ```powershell
 python server.py
 ```
 
 Open `http://127.0.0.1:8000`. Enquiries and job applications are stored in
-`data/applications.db`, with uploaded resumes under `data/resumes/`.
+`data/applications.db`; uploaded résumés and photos are stored under `data/`.
 
-## Application email notifications
+Copy `.env.example` to `.env` when configuring email locally. Never commit the
+real `.env` file. Gmail SMTP is supported by setting the Gmail host, port,
+username, app password, sender address, and TLS values. GoDaddy's local relay
+works without a username or password.
 
-Copy `.env.example` to `.env` and fill in the SMTP username, app password and
-sender address. When an application succeeds, the server emails the complete
-application and attached resume to `ADMIN_EMAIL`, then sends a confirmation to
-the candidate. The application remains saved if email delivery temporarily
-fails, and the failure is written to the server log.
+## Deploy to GoDaddy
 
-Never commit a real SMTP password. For an existing Render service, add
-`SMTP_USERNAME`, `SMTP_PASSWORD` and `SMTP_FROM_EMAIL` manually under the
-service's **Environment** settings. The non-secret settings are declared in
-`render.yaml`.
+The production entry point is `passenger_wsgi.py`, callable `application`, for
+GoDaddy Web Hosting (cPanel) Python Selector. Follow `GODADDY_DEPLOYMENT.md` for
+the required hosting plan, upload, Python application, email, DNS, and SSL steps.
 
-## Deploy on Render
+Run the checks before deployment:
 
-Deploy the repository as a **Web Service** (not a Static Site). The included
-`render.yaml` starts `python server.py`, uses Render's assigned port, and checks
-`/api/health` after deployment.
+```powershell
+python -m unittest discover -s tests -v
+```

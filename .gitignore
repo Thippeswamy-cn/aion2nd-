@@ -1,3 +1,4 @@
+.env
 .server.stdout.log
 .server.stderr.log
 *.current.log
@@ -9,3 +10,4 @@ __pycache__/
 ui-*.png
 .chrome-test/
 readme.local-backup.txt
+*-godaddy-deploy.zip

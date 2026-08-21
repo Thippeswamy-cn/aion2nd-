@@ -10,6 +10,7 @@ import secrets
 import smtplib
 import sqlite3
 import ssl
+from contextlib import closing
 from datetime import datetime, timezone
 from email.message import EmailMessage
 from email.parser import BytesParser
@@ -107,8 +108,12 @@ EXPERIENCE_LEVELS = {
 
 
 def email_notifications_configured() -> bool:
-    required = ("SMTP_HOST", "SMTP_PORT", "SMTP_USERNAME", "SMTP_PASSWORD", "SMTP_FROM_EMAIL", "ADMIN_EMAIL")
-    return all(os.environ.get(name, "").strip() for name in required)
+    required = ("SMTP_HOST", "SMTP_PORT", "SMTP_FROM_EMAIL", "ADMIN_EMAIL")
+    if not all(os.environ.get(name, "").strip() for name in required):
+        return False
+    has_username = bool(os.environ.get("SMTP_USERNAME", "").strip())
+    has_password = bool(os.environ.get("SMTP_PASSWORD", "").strip())
+    return has_username == has_password
 
 
 def _email_header(value: str, limit: int = 120) -> str:
@@ -191,8 +196,8 @@ def send_application_emails(application_id: str, fields: dict[str, str], resume,
         raise RuntimeError("SMTP_PORT must be a number.") from exc
 
     host = os.environ["SMTP_HOST"].strip()
-    username = os.environ["SMTP_USERNAME"].strip()
-    password = os.environ["SMTP_PASSWORD"]
+    username = os.environ.get("SMTP_USERNAME", "").strip()
+    password = os.environ.get("SMTP_PASSWORD", "")
     use_tls = os.environ.get("SMTP_USE_TLS", "true").strip().lower() in {"1", "true", "yes", "on"}
     context = ssl.create_default_context()
     messages = build_application_emails(application_id, fields, resume, photo)
@@ -206,7 +211,8 @@ def send_application_emails(application_id: str, fields: dict[str, str], resume,
         if use_tls and port != 465:
             client.starttls(context=context)
             client.ehlo()
-        client.login(username, password)
+        if username and password:
+            client.login(username, password)
         for message in messages:
             client.send_message(message)
 
@@ -214,7 +220,7 @@ def send_application_emails(application_id: str, fields: dict[str, str], resume,
 def initialize_database() -> None:
     UPLOAD_DIR.mkdir(parents=True, exist_ok=True)
     PHOTO_DIR.mkdir(parents=True, exist_ok=True)
-    with sqlite3.connect(DATABASE) as connection:
+    with closing(sqlite3.connect(DATABASE)) as connection, connection:
         connection.execute("PRAGMA journal_mode=WAL")
         connection.execute(
             """
@@ -271,6 +277,146 @@ def initialize_database() -> None:
             connection.execute(
                 "ALTER TABLE enquiries ADD COLUMN qualification TEXT NOT NULL DEFAULT ''"
             )
+
+
+def create_enquiry_record(fields) -> tuple[HTTPStatus, dict]:
+    """Validate and store one enquiry from any supported HTTP adapter."""
+    required = ("fullName", "email", "phone", "enquiryType", "qualification", "message")
+    if not isinstance(fields, dict) or any(
+        not isinstance(fields.get(name), str) or not fields[name].strip()
+        for name in required
+    ):
+        return HTTPStatus.BAD_REQUEST, {"error": "Please complete all required fields."}
+
+    fields = {key: value.strip() for key, value in fields.items() if isinstance(value, str)}
+    if not re.fullmatch(r"[^\s@]+@[^\s@]+\.[^\s@]+", fields["email"]):
+        return HTTPStatus.BAD_REQUEST, {"error": "Please enter a valid email address."}
+    if not re.fullmatch(r"[0-9+() -]{10,18}", fields["phone"]):
+        return HTTPStatus.BAD_REQUEST, {"error": "Please enter a valid phone number."}
+
+    enquiry_types = {"Job opportunities", "Eligibility", "Application status", "Employer enquiry", "Other"}
+    if (
+        fields["enquiryType"] not in enquiry_types
+        or fields["qualification"] not in ENQUIRY_CATEGORIES
+        or len(fields["fullName"]) > 100
+        or len(fields["message"]) > 2000
+    ):
+        return HTTPStatus.BAD_REQUEST, {"error": "Please check your enquiry details."}
+
+    enquiry_id = f"ENQ-{datetime.now(timezone.utc):%Y%m%d}-{secrets.token_hex(4).upper()}"
+    with closing(sqlite3.connect(DATABASE)) as connection, connection:
+        connection.execute(
+            """INSERT INTO enquiries
+            (id, full_name, email, phone, enquiry_type, qualification, message, submitted_at)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?)""",
+            (
+                enquiry_id, fields["fullName"], fields["email"].lower(), fields["phone"],
+                fields["enquiryType"], fields["qualification"], fields["message"],
+                datetime.now(timezone.utc).isoformat(),
+            ),
+        )
+    return HTTPStatus.CREATED, {"message": "Enquiry received.", "enquiryId": enquiry_id}
+
+
+def validate_application(fields, resume, photo) -> str | None:
+    """Return a user-facing validation error, or None for a valid application."""
+    required = ("fullName", "email", "phone", "location", "qualification", "experience")
+    if any(not fields.get(name) for name in required):
+        return "Please complete all required fields."
+    if fields.get("consent") != "on":
+        return "Consent is required to submit an application."
+    if fields["qualification"] not in QUALIFICATIONS or fields["experience"] not in EXPERIENCE_LEVELS:
+        return "Please select valid qualification and experience values."
+    role = fields.get("role", "")
+    if role and role not in ROLES:
+        return "Please select a valid open role."
+    qualification_category = DEGREE_CATEGORIES.get(fields["qualification"], fields["qualification"])
+    if role and role not in ROLES_BY_QUALIFICATION[qualification_category]:
+        return "Please select a role related to your qualification."
+    if role == "Other" and not fields.get("otherRole", "").strip():
+        return "Please enter the role you are looking for."
+    if len(fields.get("otherRole", "")) > 100:
+        return "The requested role must be 100 characters or fewer."
+    if len(fields["fullName"]) > 100 or len(fields["location"]) > 100 or len(fields.get("message", "")) > 2000:
+        return "One or more fields are too long."
+    if not re.fullmatch(r"[^\s@]+@[^\s@]+\.[^\s@]+", fields["email"]):
+        return "Please enter a valid email address."
+    if not re.fullmatch(r"[0-9+() -]{10,18}", fields["phone"]):
+        return "Please enter a valid phone number."
+    if not resume:
+        return "Please attach your résumé."
+    filename, content_type, content = resume
+    extension = Path(filename).suffix.lower()
+    if extension not in ALLOWED_RESUMES or content_type not in ALLOWED_RESUMES[extension]:
+        return "Résumé must be a PDF, DOC or DOCX file."
+    if not content or len(content) > MAX_RESUME_SIZE:
+        return "Résumé must be smaller than 5 MB."
+    if not photo:
+        return "Please attach your photo."
+    photo_filename, photo_content_type, photo_content = photo
+    photo_extension = Path(photo_filename).suffix.lower()
+    if photo_extension not in ALLOWED_PHOTOS or photo_content_type not in ALLOWED_PHOTOS[photo_extension]:
+        return "Photo must be a JPG, PNG or WebP file."
+    if not photo_content or len(photo_content) > MAX_PHOTO_SIZE:
+        return "Photo must be smaller than 3 MB."
+    return None
+
+
+def create_application_record(fields, resume, photo) -> tuple[HTTPStatus, dict]:
+    """Validate, store, and notify for one job application."""
+    error = validate_application(fields, resume, photo)
+    if error:
+        return HTTPStatus.BAD_REQUEST, {"error": error}
+
+    application_id = f"AION-{datetime.now(timezone.utc):%Y%m%d}-{secrets.token_hex(4).upper()}"
+    original_name, _, resume_bytes = resume
+    extension = Path(original_name).suffix.lower()
+    resume_path = UPLOAD_DIR / f"{application_id}{extension}"
+    photo_original_name, _, photo_bytes = photo
+    photo_extension = Path(photo_original_name).suffix.lower()
+    photo_path = PHOTO_DIR / f"{application_id}{photo_extension}"
+    resume_path.write_bytes(resume_bytes)
+    photo_path.write_bytes(photo_bytes)
+    role = requested_role(fields)
+    try:
+        with closing(sqlite3.connect(DATABASE)) as connection, connection:
+            connection.execute(
+                """INSERT INTO applications
+                (id, role, full_name, email, phone, location, qualification,
+                 experience, message, resume_path, resume_original_name, photo_path,
+                 photo_original_name, submitted_at)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)""",
+                (
+                    application_id, role, fields["fullName"],
+                    fields["email"].lower(), fields["phone"], fields["location"],
+                    fields["qualification"], fields["experience"], fields.get("message", ""),
+                    str(resume_path.relative_to(ROOT)), original_name,
+                    str(photo_path.relative_to(ROOT)), photo_original_name,
+                    datetime.now(timezone.utc).isoformat(),
+                ),
+            )
+    except sqlite3.IntegrityError:
+        resume_path.unlink(missing_ok=True)
+        photo_path.unlink(missing_ok=True)
+        return HTTPStatus.CONFLICT, {
+            "error": "An application for this role already exists for that email address."
+        }
+
+    email_notification_sent = False
+    try:
+        send_application_emails(application_id, fields, resume, photo)
+        email_notification_sent = True
+    except Exception as exc:
+        print(
+            f"Email notification failed for {application_id}: {type(exc).__name__}: {exc}",
+            flush=True,
+        )
+
+    return HTTPStatus.CREATED, {
+        "message": "Application received.",
+        "applicationId": application_id,
+        "emailNotificationSent": email_notification_sent,
+    }
 
 
 class ApplicationHandler(SimpleHTTPRequestHandler):
@@ -358,41 +504,8 @@ class ApplicationHandler(SimpleHTTPRequestHandler):
         except (json.JSONDecodeError, UnicodeDecodeError):
             self.send_json(HTTPStatus.BAD_REQUEST, {"error": "Invalid enquiry data."})
             return
-
-        required = ("fullName", "email", "phone", "enquiryType", "qualification", "message")
-        if any(not isinstance(fields.get(name), str) or not fields[name].strip() for name in required):
-            self.send_json(HTTPStatus.BAD_REQUEST, {"error": "Please complete all required fields."})
-            return
-        fields = {key: value.strip() for key, value in fields.items() if isinstance(value, str)}
-        if not re.fullmatch(r"[^\s@]+@[^\s@]+\.[^\s@]+", fields["email"]):
-            self.send_json(HTTPStatus.BAD_REQUEST, {"error": "Please enter a valid email address."})
-            return
-        if not re.fullmatch(r"[0-9+() -]{10,18}", fields["phone"]):
-            self.send_json(HTTPStatus.BAD_REQUEST, {"error": "Please enter a valid phone number."})
-            return
-        enquiry_types = {"Job opportunities", "Eligibility", "Application status", "Employer enquiry", "Other"}
-        if (
-            fields["enquiryType"] not in enquiry_types
-            or fields["qualification"] not in ENQUIRY_CATEGORIES
-            or len(fields["fullName"]) > 100
-            or len(fields["message"]) > 2000
-        ):
-            self.send_json(HTTPStatus.BAD_REQUEST, {"error": "Please check your enquiry details."})
-            return
-
-        enquiry_id = f"ENQ-{datetime.now(timezone.utc):%Y%m%d}-{secrets.token_hex(4).upper()}"
-        with sqlite3.connect(DATABASE) as connection:
-            connection.execute(
-                """INSERT INTO enquiries
-                (id, full_name, email, phone, enquiry_type, qualification, message, submitted_at)
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?)""",
-                (
-                    enquiry_id, fields["fullName"], fields["email"].lower(), fields["phone"],
-                    fields["enquiryType"], fields["qualification"], fields["message"],
-                    datetime.now(timezone.utc).isoformat(),
-                ),
-            )
-        self.send_json(HTTPStatus.CREATED, {"message": "Enquiry received.", "enquiryId": enquiry_id})
+        status, payload = create_enquiry_record(fields)
+        self.send_json(status, payload)
 
     def create_application(self) -> None:
         try:
@@ -424,108 +537,12 @@ class ApplicationHandler(SimpleHTTPRequestHandler):
             elif name:
                 fields[name] = (part.get_content() or "").strip()
 
-        error = self.validate(fields, resume, photo)
-        if error:
-            self.send_json(HTTPStatus.BAD_REQUEST, {"error": error})
-            return
-
-        application_id = f"AION-{datetime.now(timezone.utc):%Y%m%d}-{secrets.token_hex(4).upper()}"
-        original_name, _, resume_bytes = resume
-        extension = Path(original_name).suffix.lower()
-        resume_path = UPLOAD_DIR / f"{application_id}{extension}"
-        photo_original_name, _, photo_bytes = photo
-        photo_extension = Path(photo_original_name).suffix.lower()
-        photo_path = PHOTO_DIR / f"{application_id}{photo_extension}"
-        resume_path.write_bytes(resume_bytes)
-        photo_path.write_bytes(photo_bytes)
-        role = requested_role(fields)
-        try:
-            with sqlite3.connect(DATABASE) as connection:
-                connection.execute(
-                    """INSERT INTO applications
-                    (id, role, full_name, email, phone, location, qualification,
-                     experience, message, resume_path, resume_original_name, photo_path,
-                     photo_original_name, submitted_at)
-                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)""",
-                    (
-                        application_id, role, fields["fullName"],
-                        fields["email"].lower(), fields["phone"], fields["location"],
-                        fields["qualification"], fields["experience"], fields.get("message", ""),
-                        str(resume_path.relative_to(ROOT)), original_name,
-                        str(photo_path.relative_to(ROOT)), photo_original_name,
-                        datetime.now(timezone.utc).isoformat(),
-                    ),
-                )
-        except sqlite3.IntegrityError:
-            resume_path.unlink(missing_ok=True)
-            photo_path.unlink(missing_ok=True)
-            self.send_json(
-                HTTPStatus.CONFLICT,
-                {"error": "An application for this role already exists for that email address."},
-            )
-            return
-
-        email_notification_sent = False
-        try:
-            send_application_emails(application_id, fields, resume, photo)
-            email_notification_sent = True
-        except Exception as exc:
-            print(
-                f"Email notification failed for {application_id}: {type(exc).__name__}: {exc}",
-                flush=True,
-            )
-
-        self.send_json(
-            HTTPStatus.CREATED,
-            {
-                "message": "Application received.",
-                "applicationId": application_id,
-                "emailNotificationSent": email_notification_sent,
-            },
-        )
+        status, payload = create_application_record(fields, resume, photo)
+        self.send_json(status, payload)
 
     @staticmethod
     def validate(fields, resume, photo) -> str | None:
-        required = ("fullName", "email", "phone", "location", "qualification", "experience")
-        if any(not fields.get(name) for name in required):
-            return "Please complete all required fields."
-        if fields.get("consent") != "on":
-            return "Consent is required to submit an application."
-        if fields["qualification"] not in QUALIFICATIONS or fields["experience"] not in EXPERIENCE_LEVELS:
-            return "Please select valid qualification and experience values."
-        role = fields.get("role", "")
-        if role and role not in ROLES:
-            return "Please select a valid open role."
-        qualification_category = DEGREE_CATEGORIES.get(fields["qualification"], fields["qualification"])
-        if role and role not in ROLES_BY_QUALIFICATION[qualification_category]:
-            return "Please select a role related to your qualification."
-        if role == "Other" and not fields.get("otherRole", "").strip():
-            return "Please enter the role you are looking for."
-        if len(fields.get("otherRole", "")) > 100:
-            return "The requested role must be 100 characters or fewer."
-        if len(fields["fullName"]) > 100 or len(fields["location"]) > 100 or len(fields.get("message", "")) > 2000:
-            return "One or more fields are too long."
-        if not re.fullmatch(r"[^\s@]+@[^\s@]+\.[^\s@]+", fields["email"]):
-            return "Please enter a valid email address."
-        if not re.fullmatch(r"[0-9+() -]{10,18}", fields["phone"]):
-            return "Please enter a valid phone number."
-        if not resume:
-            return "Please attach your résumé."
-        filename, content_type, content = resume
-        extension = Path(filename).suffix.lower()
-        if extension not in ALLOWED_RESUMES or content_type not in ALLOWED_RESUMES[extension]:
-            return "Résumé must be a PDF, DOC or DOCX file."
-        if not content or len(content) > MAX_RESUME_SIZE:
-            return "Résumé must be smaller than 5 MB."
-        if not photo:
-            return "Please attach your photo."
-        photo_filename, photo_content_type, photo_content = photo
-        photo_extension = Path(photo_filename).suffix.lower()
-        if photo_extension not in ALLOWED_PHOTOS or photo_content_type not in ALLOWED_PHOTOS[photo_extension]:
-            return "Photo must be a JPG, PNG or WebP file."
-        if not photo_content or len(photo_content) > MAX_PHOTO_SIZE:
-            return "Photo must be smaller than 3 MB."
-        return None
+        return validate_application(fields, resume, photo)
 
     def send_json(self, status: HTTPStatus, payload: dict) -> None:
         encoded = json.dumps(payload).encode("utf-8")

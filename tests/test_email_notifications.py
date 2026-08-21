@@ -35,6 +35,18 @@ class ApplicationEmailTests(unittest.TestCase):
             os.environ["SMTP_PASSWORD"] = ""
             self.assertFalse(email_notifications_configured())
 
+    def test_configuration_accepts_godaddy_relay_without_login(self):
+        settings = {
+            **self.settings,
+            "SMTP_HOST": "localhost",
+            "SMTP_PORT": "25",
+            "SMTP_USERNAME": "",
+            "SMTP_PASSWORD": "",
+            "SMTP_USE_TLS": "false",
+        }
+        with patch.dict(os.environ, settings, clear=False):
+            self.assertTrue(email_notifications_configured())
+
     def test_general_application_email_does_not_reference_a_missing_role(self):
         fields = {key: value for key, value in self.fields.items() if key != "role"}
         with patch.dict(os.environ, self.settings, clear=False):
@@ -64,6 +76,25 @@ class ApplicationEmailTests(unittest.TestCase):
         self.assertEqual(len(list(admin_message.iter_attachments())), 2)
         self.assertEqual(str(candidate_message["To"]), "candidate@example.com")
         self.assertIn("AION-TEST-001", candidate_message.get_content())
+
+    @patch("server.smtplib.SMTP")
+    def test_godaddy_relay_does_not_attempt_smtp_login(self, smtp):
+        client = smtp.return_value
+        settings = {
+            **self.settings,
+            "SMTP_HOST": "localhost",
+            "SMTP_PORT": "25",
+            "SMTP_USERNAME": "",
+            "SMTP_PASSWORD": "",
+            "SMTP_USE_TLS": "false",
+        }
+        with patch.dict(os.environ, settings, clear=False):
+            send_application_emails("AION-TEST-003", self.fields, self.resume, self.photo)
+
+        smtp.assert_called_once_with("localhost", 25, timeout=20)
+        client.starttls.assert_not_called()
+        client.login.assert_not_called()
+        self.assertEqual(client.send_message.call_count, 2)
 
 
 if __name__ == "__main__":
